@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANTONIO FERNANDEZ — Sistemas de Automatización e IA</title>
+<meta name="description" content="Sistemas de inteligencia artificial para empresas: atención 24/7, seguridad y automatización de procesos. Operado por ARGOS. Torreón, México.">
+<meta property="og:title" content="ANTONIO FERNANDEZ — Automatización e IA para empresas">
+<meta property="og:description" content="Empleados virtuales 24/7, seguridad y automatización de procesos. Suscripción mensual, sin plazo forzoso. Torreón, México.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0B0B0A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230B0B0A'/%3E%3Ctext x='32' y='44' font-family='Arial Black,Arial' font-size='30' font-weight='900' fill='%23F2F1EC' text-anchor='middle'%3EAF%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2F1EC;
+  --ink:#0B0B0A;
+  --grey:#55534E;
+  --grey-lt:#8B897F;
+  --hair:rgba(11,11,10,.85);
+  --rail:56px;
+}
+*{margin:0;padding:0;box-sizing:border-box;border-radius:0!important;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:'Archivo',sans-serif;font-size:16px;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+::selection{background:var(--ink);color:var(--paper);}
+a{color:inherit;}
+
+/* grain */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.mono{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.09em;}
+.macro{font-family:'Archivo Black','Archivo',sans-serif;text-transform:uppercase;letter-spacing:-.035em;line-height:.88;}
+
+/* énfasis de imprenta: bloque de tinta, no tipografía */
+mark{background:var(--ink);color:var(--paper);padding:.04em .22em;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
+.inv mark{background:var(--paper);color:var(--ink);}
+
+.wrap{max-width:1500px;margin:0 auto;}
+
+/* ============ LEFT RAIL ============ */
+.rail{
+  position:fixed;top:0;left:0;bottom:0;width:var(--rail);z-index:200;
+  border-right:1px solid var(--hair);background:var(--paper);
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  padding:14px 0;
+}
+.rail .vtxt{
+  writing-mode:vertical-rl;font-size:.6rem;color:var(--grey);
+  display:flex;gap:18px;align-items:center;
+}
+.rail .dot{width:7px;height:7px;background:var(--ink);}
+.rail .pct{font-size:.6rem;}
+main{margin-left:var(--rail);}
+@media(max-width:900px){.rail{display:none;}main{margin-left:0;}}
+
+/* ============ HEADER ============ */
+header{
+  position:sticky;top:0;z-index:150;background:var(--paper);
+  border-bottom:1px solid var(--hair);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:13px 28px;
+}
+header .brand{font-size:.72rem;font-weight:700;}
+header nav{display:flex;gap:26px;}
+header nav a{font-size:.62rem;text-decoration:none;color:var(--grey);}
+header nav a:hover{color:var(--ink);text-decoration:line-through;}
+header .clock{font-size:.62rem;color:var(--grey);}
+header .clock #clock{color:var(--ink);}
+@media(max-width:600px){header .clock-lbl{display:none;}}
+@media(max-width:760px){header nav{display:none;}}
+
+/* ============ HERO ============ */
+.hero{border-bottom:1px solid var(--hair);position:relative;}
+.hero .meta{
+  display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding:14px 28px;border-bottom:1px solid var(--hair);
+  font-size:.6rem;color:var(--grey);
+}
+.hero-grid{display:grid;grid-template-columns:1.55fr 1fr;}
+.hero-left{padding:72px 28px 84px;border-right:1px solid var(--hair);position:relative;}
+.hero-left h1{font-size:clamp(3.4rem,9.2vw,9.8rem);}
+.hero-left h1 .l2{display:block;margin-left:.9em;}
+.hero-left .strap{
+  margin-top:44px;max-width:46ch;
+  font-size:clamp(1.02rem,1.45vw,1.25rem);line-height:1.6;font-weight:500;
+}
+.hero-left .hcross{position:absolute;font-size:.85rem;color:var(--grey);}
+.hero-right{display:flex;flex-direction:column;}
+.hero-right .doc{
+  padding:22px 28px;border-bottom:1px solid var(--hair);
+  font-size:.62rem;color:var(--grey);
+}
+.hero-right .doc .drow{
+  display:grid;grid-template-columns:96px 1fr;gap:12px;
+  padding:5px 0;align-items:baseline;
+}
+.hero-right .doc b{color:var(--ink);font-weight:500;line-height:1.8;}
+.toc{padding:26px 28px;flex:1;}
+.toc h2{font-size:.62rem;color:var(--grey);margin-bottom:18px;}
+.toc a{
+  display:flex;align-items:baseline;gap:10px;text-decoration:none;
+  font-size:.72rem;padding:9px 0;
+}
+.toc a .fill{flex:1;border-bottom:1px dotted var(--grey-lt);transform:translateY(-3px);}
+.toc a:hover .t{text-decoration:underline;}
+.toc a .pg{color:var(--grey);}
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr;}
+  .hero-left{border-right:none;border-bottom:1px solid var(--hair);padding:56px 24px 64px;}
+}
+
+/* ============ BLACK BAND ============ */
+.band{
+  background:var(--ink);color:var(--paper);border-bottom:1px solid var(--hair);
+  padding:38px 28px 30px;
+}
+.band .row{display:flex;align-items:center;justify-content:space-between;gap:28px;}
+.band .big{font-size:clamp(1.4rem,3.4vw,3rem);}
+.band .barcode{
+  height:44px;flex:0 0 150px;
+  background:repeating-linear-gradient(90deg,var(--paper) 0 2px,transparent 2px 5px,var(--paper) 5px 6px,transparent 6px 11px,var(--paper) 11px 15px,transparent 15px 18px);
+}
+.band .fn{
+  margin-top:22px;padding-top:14px;border-top:1px solid rgba(242,241,236,.28);
+  font-size:.6rem;color:#8B897F;line-height:1.9;
+}
+@media(max-width:700px){.band .barcode{display:none;}}
+
+/* ============ SECTION CHROME ============ */
+section{border-bottom:1px solid var(--hair);scroll-margin-top:52px;}
+.shead{
+  display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+  padding:16px 28px;border-bottom:1px solid var(--hair);
+}
+.shead .no{font-size:.62rem;color:var(--grey);}
+.shead h2{font-size:clamp(1.5rem,3vw,2.6rem);}
+.shead .pg{font-size:.62rem;color:var(--grey);}
+
+/* ============ 01 CAPACIDADES ============ */
+.svc-row{
+  display:grid;grid-template-columns:110px 1.15fr 1fr 120px;
+  align-items:center;gap:24px;
+  padding:30px 28px;border-bottom:1px solid var(--hair);
+  text-decoration:none;transition:background .12s,color .12s;
+}
+.svc-row:last-of-type{border-bottom:none;}
+.svc-row .n{font-size:.68rem;color:var(--grey);}
+.svc-row h3{
+  font-family:'Archivo Black',sans-serif;text-transform:uppercase;
+  font-size:clamp(1.15rem,2.5vw,2rem);letter-spacing:-.02em;line-height:.95;
+}
+.svc-row p{font-size:.82rem;line-height:1.6;color:var(--grey);max-width:48ch;}
+.svc-row .code{font-size:.62rem;color:var(--grey-lt);text-align:right;}
+.svc-row:hover{background:var(--ink);color:var(--paper);}
+.svc-row:hover p{color:#B9B7AE;}
+.svc-row:hover .n,.svc-row:hover .code{color:#8B897F;}
+@media(max-width:860px){
+  .svc-row{grid-template-columns:64px 1fr;grid-template-rows:auto auto;padding:26px 24px;row-gap:10px;}
+  .svc-row p{grid-column:2;}
+  .svc-row .code{display:none;}
+}
+
+/* ============ FIG 01 ============ */
+.fig{padding:44px 28px 52px;border-top:1px solid var(--hair);}
+.fig .cap{font-size:.62rem;color:var(--grey);margin-bottom:20px;display:flex;justify-content:space-between;}
+.fig pre{
+  font-family:'JetBrains Mono',monospace;font-size:clamp(.55rem,1.35vw,.8rem);
+  line-height:1.55;overflow-x:auto;color:var(--ink);
+  width:fit-content;max-width:100%;margin:0 auto;
+}
+
+/* ============ 02 ARGOS ============ */
+#sistema{background:var(--ink);color:var(--paper);}
+#sistema .shead{border-color:rgba(242,241,236,.28);}
+#sistema .shead .no,#sistema .shead .pg{color:#8B897F;}
+.argos-wrap{display:grid;grid-template-columns:1.35fr 1fr;}
+.argos-copy{padding:64px 28px 72px;border-right:1px solid rgba(242,241,236,.28);}
+.argos-copy .ttl{font-size:clamp(3rem,8vw,8rem);}
+.argos-copy .ttl sup{font-size:.22em;vertical-align:super;letter-spacing:.1em;}
+.argos-copy p{margin-top:32px;font-size:1rem;line-height:1.7;color:#C6C4BB;max-width:56ch;}
+.argos-copy p b{color:var(--paper);font-weight:600;}
+.cert{
+  margin-top:44px;display:inline-block;border:1px solid rgba(242,241,236,.5);
+  padding:14px 18px;font-size:.6rem;line-height:2;color:#C6C4BB;
+}
+.cert b{display:block;color:var(--paper);font-size:.68rem;letter-spacing:.16em;font-weight:700;}
+.argos-specs{display:flex;flex-direction:column;}
+.argos-specs dl{flex:1;display:flex;flex-direction:column;}
+.argos-specs .srow{
+  display:flex;justify-content:space-between;align-items:center;gap:14px;
+  padding:22px 28px;border-bottom:1px solid rgba(242,241,236,.28);flex:1;
+}
+.argos-specs .srow:last-child{border-bottom:none;}
+.argos-specs dt{font-size:.62rem;color:#8B897F;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.09em;}
+.argos-specs dd{font-family:'Archivo Black',sans-serif;font-size:1.15rem;text-transform:uppercase;letter-spacing:-.01em;}
+@media(max-width:900px){
+  .argos-wrap{grid-template-columns:1fr;}
+  .argos-copy{border-right:none;border-bottom:1px solid rgba(242,241,236,.28);padding:52px 24px;}
+}
+
+/* ============ 03 TARIFAS ============ */
+.tbl-scroll{overflow-x:auto;}
+table{border-collapse:collapse;width:100%;min-width:820px;}
+th,td{border:1px solid var(--hair);border-left:none;padding:16px 20px;text-align:left;vertical-align:top;}
+th:last-child,td:last-child{border-right:none;}
+thead th{border-top:none;}
+col.c-first{width:30%;}
+thead .plan-h{vertical-align:bottom;}
+thead .plan-h .tag{font-size:.6rem;color:var(--grey);display:block;margin-bottom:14px;}
+thead .plan-h .price{font-family:'Archivo Black',sans-serif;font-size:clamp(1.5rem,2.6vw,2.4rem);letter-spacing:-.03em;display:block;line-height:1;}
+thead .plan-h .per{font-size:.58rem;color:var(--grey);display:block;margin-top:8px;}
+tbody th{font-size:.66rem;font-weight:400;color:var(--grey);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.09em;}
+tbody td{font-size:.84rem;}
+tbody td .no{color:var(--grey-lt);}
+td.feat,th.feat{background:var(--ink);color:var(--paper);}
+thead th.feat .tag,thead th.feat .per{color:#8B897F;}
+tbody td.feat .no{color:#6E6C64;}
+tfoot td{border-bottom:none;padding:0;}
+tfoot a{
+  display:block;text-align:center;text-decoration:none;font-size:.68rem;font-weight:700;
+  font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.09em;
+  padding:18px;transition:all .12s;
+}
+tfoot td:not(.feat) a:hover{background:var(--ink);color:var(--paper);}
+tfoot td.feat a{background:var(--ink);color:var(--paper);}
+tfoot td.feat a:hover{background:var(--paper);color:var(--ink);}
+.tbl-note{padding:14px 28px;font-size:.6rem;color:var(--grey);line-height:1.9;border-top:1px solid var(--hair);}
+.swipe-hint{display:none;padding:10px 24px 0;font-size:.6rem;color:var(--grey);}
+@media(max-width:880px){.swipe-hint{display:block;}}
+
+/* ============ 04 PROCEDIMIENTO ============ */
+.steps{display:grid;grid-template-columns:repeat(2,1fr);}
+.pstep{
+  display:grid;grid-template-columns:96px 1fr;gap:20px;
+  padding:38px 28px;border-bottom:1px solid var(--hair);
+}
+.pstep:nth-child(odd){border-right:1px solid var(--hair);}
+.pstep:nth-last-child(-n+2){border-bottom:none;}
+.pstep .n{font-family:'Archivo Black',sans-serif;font-size:2.4rem;letter-spacing:-.03em;line-height:1;}
+.pstep .wk{display:block;font-size:.58rem;color:var(--grey);margin-top:10px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.09em;}
+.pstep h4{font-size:.95rem;font-weight:700;text-transform:uppercase;letter-spacing:.01em;margin-bottom:8px;}
+.pstep p{font-size:.82rem;color:var(--grey);line-height:1.6;max-width:44ch;}
+@media(max-width:760px){
+  .steps{grid-template-columns:1fr;}
+  .pstep:nth-child(odd){border-right:none;}
+  .pstep:nth-last-child(-n+2){border-bottom:1px solid var(--hair);}
+  .pstep:last-child{border-bottom:none;}
+}
+
+/* ============ 05 CONTACTO ============ */
+#contacto{border-bottom:none;}
+.contact{display:grid;grid-template-columns:1.35fr 1fr;}
+.contact-copy{padding:64px 28px 72px;border-right:1px solid var(--hair);}
+.contact-copy p{font-size:clamp(1.05rem,1.6vw,1.4rem);line-height:1.65;font-weight:500;max-width:46ch;}
+.contact-copy .fn{margin-top:34px;font-size:.62rem;color:var(--grey);line-height:2.1;}
+.contact-acts{display:flex;flex-direction:column;}
+.contact-acts a{
+  flex:1;display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:30px 28px;text-decoration:none;
+  font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.09em;
+  font-size:.74rem;font-weight:700;border-bottom:1px solid var(--hair);
+  background:var(--paper);color:var(--ink);
+  transition:background .18s ease,color .18s ease;
+}
+.contact-acts a:last-of-type{border-bottom:none;}
+.contact-acts a .arr{font-size:1rem;}
+.contact-acts a:hover{background:var(--ink);color:var(--paper);}
+.contact-acts .hours{
+  padding:18px 28px;font-size:.6rem;color:var(--grey);line-height:2;
+  border-top:1px solid var(--hair);
+}
+@media(max-width:900px){
+  .contact{grid-template-columns:1fr;}
+  .contact-copy{border-right:none;border-bottom:1px solid var(--hair);padding:52px 24px;}
+}
+.cutline{margin:0 28px;border-top:2px dashed var(--grey-lt);position:relative;}
+.cutline span{
+  position:absolute;top:-9px;left:18px;background:var(--paper);
+  padding:0 10px;font-size:.58rem;color:var(--grey);
+}
+footer{
+  display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  padding:22px 28px 26px;font-size:.6rem;color:var(--grey);
+}
+
+/* ============ BARRA FIJA MÓVIL ============ */
+.mobile-cta{
+  display:none;position:fixed;left:0;right:0;bottom:0;z-index:300;
+  background:var(--ink);border-top:1px solid var(--hair);
+}
+.mobile-cta a{
+  flex:1;text-align:center;text-decoration:none;padding:16px 8px;
+  font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;
+  font-size:.66rem;font-weight:700;color:var(--paper);
+}
+.mobile-cta a+a{border-left:1px solid rgba(242,241,236,.3);}
+@media(max-width:760px){
+  .mobile-cta{display:flex;}
+  footer{padding-bottom:78px;}
+}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(12px);transition:opacity .55s ease,transform .55s ease;}
+.rv.on{opacity:1;transform:none;}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none;}}
+</style>
+</head>
+<body>
+
+<aside class="rail mono" aria-hidden="true">
+  <span class="dot"></span>
+  <span class="vtxt">ANTONIO FERNANDEZ — DOCUMENTO DE PRESENTACIÓN COMERCIAL — MX &nbsp;·&nbsp; REV 1.2</span>
+  <span class="pct" id="pct">000%</span>
+</aside>
+
+<main>
+
+<header>
+  <span class="brand mono">A.FERNANDEZ&nbsp;®</span>
+  <nav class="mono">
+    <a href="#capacidades">01 — CAPACIDADES</a>
+    <a href="#sistema">02 — EL SISTEMA</a>
+    <a href="#tarifas">03 — TARIFAS</a>
+    <a href="#contacto">05 — CONTACTO</a>
+  </nav>
+  <span class="clock mono"><span class="clock-lbl">EN ESTA PÁGINA ·</span> <span id="clock">00:00</span></span>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="meta mono">
+    <span>DOC. AF-2026 / PRESENTACIÓN COMERCIAL</span>
+    <span>TORREÓN, COAH. — MÉXICO</span>
+    <span>VÁLIDO DESDE JUL. 2026</span>
+  </div>
+  <div class="hero-grid">
+    <div class="hero-left">
+      <span class="hcross mono" style="top:22px;right:22px;">+</span>
+      <span class="hcross mono" style="bottom:22px;left:22px;">+</span>
+      <h1 class="macro">Antonio<span class="l2">Fernandez</span></h1>
+      <p class="strap">Diseño e instalo sistemas de inteligencia artificial que atienden, venden y vigilan la operación de su empresa <mark>las 24 horas, los 365 días</mark> — siempre bajo supervisión humana.</p>
+    </div>
+    <div class="hero-right">
+      <div class="doc mono">
+        <div class="drow"><span>ÁREA ·</span><b>AUTOMATIZACIÓN E IA PARA EMPRESAS</b></div>
+        <div class="drow"><span>MODELO ·</span><b>SUSCRIPCIÓN MENSUAL, SIN PLAZO FORZOSO</b></div>
+        <div class="drow"><span>OPERACIÓN ·</span><b>CONTINUA — 24/7/365</b></div>
+        <div class="drow"><span>RESPALDO ·</span><b>SISTEMA ARGOS ™ + SUPERVISIÓN HUMANA</b></div>
+      </div>
+      <nav class="toc mono">
+        <h2>ÍNDICE DEL DOCUMENTO</h2>
+        <a href="#capacidades"><span class="t">CAPACIDADES</span><span class="fill"></span><span class="pg">01</span></a>
+        <a href="#sistema"><span class="t">EL SISTEMA ARGOS</span><span class="fill"></span><span class="pg">02</span></a>
+        <a href="#tarifas"><span class="t">TARIFAS DE SUSCRIPCIÓN</span><span class="fill"></span><span class="pg">03</span></a>
+        <a href="#procedimiento"><span class="t">PROCEDIMIENTO DE ARRANQUE</span><span class="fill"></span><span class="pg">04</span></a>
+        <a href="#contacto"><span class="t">CONTACTO DIRECTO</span><span class="fill"></span><span class="pg">05</span></a>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BAND ============ -->
+<div class="band inv">
+  <div class="row">
+    <span class="big macro">La empresa que responde primero es la que vende.*</span>
+    <span class="barcode" aria-hidden="true"></span>
+  </div>
+  <p class="fn mono">* HARVARD BUSINESS REVIEW: CONTACTAR A UN PROSPECTO DENTRO DE LA PRIMERA HORA MULTIPLICA POR 7 LA PROBABILIDAD DE CONCRETAR LA VENTA. LA MAYORÍA DE LAS EMPRESAS TARDA MÁS DE 24 HORAS.</p>
+</div>
+
+<!-- ============ 01 CAPACIDADES ============ -->
+<section id="capacidades">
+  <div class="shead">
+    <span class="no mono">SEC. 01</span>
+    <h2 class="macro">Capacidades</h2>
+    <span class="pg mono">PÁG. 01 / 05</span>
+  </div>
+
+  <a class="svc-row rv" href="#contacto">
+    <span class="n mono">[ 01 ]</span>
+    <h3>Empleados virtuales</h3>
+    <p>Cada mensaje sin contestar es una venta que atiende su competencia. Un agente de IA responde, cotiza y agenda por WhatsApp en menos de un minuto — a cualquier hora, todos los días.</p>
+    <span class="code mono">AF/EV—24.7</span>
+  </a>
+  <a class="svc-row rv" href="#contacto">
+    <span class="n mono">[ 02 ]</span>
+    <h3>Seguridad y monitoreo</h3>
+    <p>Un sistema caído se paga con ventas perdidas. Vigilancia continua, respaldos automáticos y alertas inmediatas: usted se entera del problema antes de que le cueste.</p>
+    <span class="code mono">AF/SEC—01</span>
+  </a>
+  <a class="svc-row rv" href="#contacto">
+    <span class="n mono">[ 03 ]</span>
+    <h3>Automatización</h3>
+    <p>Facturación, inventario, seguimiento y reportes sin intervención manual. Su equipo deja de capturar datos y vuelve al trabajo por el que usted le paga.</p>
+    <span class="code mono">AF/AUT—02</span>
+  </a>
+  <a class="svc-row rv" href="#contacto">
+    <span class="n mono">[ 04 ]</span>
+    <h3>Atención al cliente</h3>
+    <p>La IA resuelve las preguntas de rutina al instante y turna a su personal únicamente los casos que requieren criterio humano. Ningún cliente se queda esperando.</p>
+    <span class="code mono">AF/ATC—03</span>
+  </a>
+  <a class="svc-row rv" href="#contacto">
+    <span class="n mono">[ 05 ]</span>
+    <h3>Análisis de datos</h3>
+    <p>Ventas, operación y clientes en reportes que llegan solos cada semana. Decisiones sustentadas en números, sin contratar a un analista.</p>
+    <span class="code mono">AF/DAT—04</span>
+  </a>
+  <a class="svc-row rv" href="#contacto">
+    <span class="n mono">[ 06 ]</span>
+    <h3>Integraciones</h3>
+    <p>Su punto de venta, su CRM y sus hojas de cálculo, conectados en un solo flujo. La información deja de depender de que alguien la copie a mano.</p>
+    <span class="code mono">AF/INT—05</span>
+  </a>
+
+  <div class="fig rv">
+    <div class="cap mono"><span>FIG. 01 — FLUJO DE OPERACIÓN TÍPICO</span><span>ESCALA: N/A</span></div>
+    <pre aria-label="Diagrama de flujo: el cliente escribe, Argos responde y ejecuta, usted recibe el reporte">
+ CLIENTE ────────▶ WHATSAPP / LLAMADA / CORREO
+                        │
+                        ▼
+              ┌──────────────────┐
+              │   ARGOS ™ 24/7   │──── responde · cotiza · agenda
+              └──────────────────┘
+                        │
+          ┌─────────────┼─────────────┐
+          ▼             ▼             ▼
+     SU AGENDA     SU SISTEMA     REPORTE SEMANAL
+     (citas)       (POS / CRM)    (a su WhatsApp)
+                                        │
+                                        ▼
+                                 USTED — SUPERVISANDO
+                                 LA OPERACIÓN COMPLETA</pre>
+  </div>
+</section>
+
+<!-- ============ 02 ARGOS ============ -->
+<section id="sistema" class="inv">
+  <div class="shead">
+    <span class="no mono">SEC. 02</span>
+    <h2 class="macro">El sistema</h2>
+    <span class="pg mono">PÁG. 02 / 05</span>
+  </div>
+  <div class="argos-wrap">
+    <div class="argos-copy">
+      <div class="ttl macro">Argos<sup>™</sup></div>
+      <p>Todo lo que instalo en su empresa opera sobre <b>Argos</b>: infraestructura de inteligencia artificial construida y operada directamente por mí. No es un software que se le renta y se le abandona — cada empleado virtual, cada alerta y cada proceso queda bajo <mark>doble supervisión: la del sistema y la mía</mark>.</p>
+      <p>Sus datos permanecen suyos y la suscripción es mensual, sin plazo forzoso. La relación se sostiene por resultados, no por contrato.</p>
+      <div class="cert mono rv">
+        <b>REG. AF-2026</b>
+        SISTEMA EN PRODUCCIÓN · SUPERVISIÓN CONTINUA<br>
+        VERIFICABLE EN LA REUNIÓN DE DIAGNÓSTICO
+      </div>
+    </div>
+    <div class="argos-specs">
+      <dl>
+        <div class="srow"><dt>Operación</dt><dd>Continua — 24/7</dd></div>
+        <div class="srow"><dt>Respuesta al cliente</dt><dd>&lt; 1 minuto</dd></div>
+        <div class="srow"><dt>Supervisión</dt><dd>IA + humana</dd></div>
+        <div class="srow"><dt>Propiedad de datos</dt><dd>Del cliente</dd></div>
+        <div class="srow"><dt>Estado</dt><dd id="status">● En operación</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 TARIFAS ============ -->
+<section id="tarifas">
+  <div class="shead">
+    <span class="no mono">SEC. 03</span>
+    <h2 class="macro">Tarifas</h2>
+    <span class="pg mono">PÁG. 03 / 05</span>
+  </div>
+  <p class="swipe-hint mono">DESLIZA LA TABLA →</p>
+  <div class="tbl-scroll">
+  <table>
+    <colgroup><col class="c-first"><col><col><col></colgroup>
+    <thead>
+      <tr>
+        <th class="mono" style="font-size:.6rem;color:var(--grey);font-weight:400;vertical-align:bottom;">CONCEPTO / PLAN</th>
+        <th class="plan-h"><span class="tag mono">[ P-01 · INICIAL ]</span><span class="price">$4,900</span><span class="per mono">MXN / MES *</span></th>
+        <th class="plan-h feat"><span class="tag mono">[ P-02 · OPERATIVO — EL MÁS CONTRATADO ]</span><span class="price">$9,900</span><span class="per mono">MXN / MES *</span></th>
+        <th class="plan-h"><span class="tag mono">[ P-03 · TOTAL ]</span><span class="price">$19,900</span><span class="per mono">MXN / MES *</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><th>Empleados virtuales</th><td>1 (WhatsApp)</td><td class="feat">Hasta 3</td><td>Sin límite</td></tr>
+      <tr><th>Procesos automatizados</th><td>1</td><td class="feat">Los clave de su operación</td><td>A la medida</td></tr>
+      <tr><th>Monitoreo y alertas</th><td><span class="no">—</span></td><td class="feat">En tiempo real</td><td>En tiempo real</td></tr>
+      <tr><th>Seguridad y respaldos</th><td><span class="no">—</span></td><td class="feat">Básico</td><td>Completo</td></tr>
+      <tr><th>Reportes</th><td>Mensual</td><td class="feat">Semanal + análisis</td><td>Semanal + sesión estratégica</td></tr>
+      <tr><th>Soporte</th><td>Horario laboral</td><td class="feat">Prioritario</td><td>Línea directa 24/7</td></tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td></td>
+        <td><a href="https://wa.me/5218717824648?text=Buen%20d%C3%ADa.%20Me%20interesa%20el%20plan%20INICIAL%20(%244%2C900%20MXN%2Fmes)%20y%20quiero%20agendar%20la%20reuni%C3%B3n%20de%20diagn%C3%B3stico." target="_blank" rel="noopener">SOLICITAR&nbsp;&gt;&gt;</a></td>
+        <td class="feat"><a href="https://wa.me/5218717824648?text=Buen%20d%C3%ADa.%20Me%20interesa%20el%20plan%20OPERATIVO%20(%249%2C900%20MXN%2Fmes)%20y%20quiero%20agendar%20la%20reuni%C3%B3n%20de%20diagn%C3%B3stico." target="_blank" rel="noopener">SOLICITAR&nbsp;&gt;&gt;</a></td>
+        <td><a href="https://wa.me/5218717824648?text=Buen%20d%C3%ADa.%20Me%20interesa%20el%20plan%20TOTAL%20(%2419%2C900%20MXN%2Fmes)%20y%20quiero%20agendar%20la%20reuni%C3%B3n%20de%20diagn%C3%B3stico." target="_blank" rel="noopener">SOLICITAR&nbsp;&gt;&gt;</a></td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+  <p class="tbl-note mono">* PRECIOS MÁS IVA · SIN PLAZO FORZOSO · IMPLEMENTACIÓN INICIAL INCLUIDA CON COMPROMISO ANUAL.<br>REFERENCIA: EL PLAN OPERATIVO EQUIVALE A UNA FRACCIÓN DEL COSTO MENSUAL DE UN SOLO EMPLEADO — Y CUBRE LA OPERACIÓN LAS 24 HORAS.</p>
+</section>
+
+<!-- ============ 04 PROCEDIMIENTO ============ -->
+<section id="procedimiento">
+  <div class="shead">
+    <span class="no mono">SEC. 04</span>
+    <h2 class="macro">Procedimiento</h2>
+    <span class="pg mono">PÁG. 04 / 05</span>
+  </div>
+  <div class="steps">
+    <div class="pstep rv">
+      <div><span class="n macro">01</span><span class="wk">SEMANA 0</span></div>
+      <div><h4>Diagnóstico</h4><p>Una reunión de 45 minutos, sin costo y sin compromiso. Evalúo su operación y le indico con claridad dónde conviene automatizar — y dónde no.</p></div>
+    </div>
+    <div class="pstep rv">
+      <div><span class="n macro">02</span><span class="wk">SEMANA 0</span></div>
+      <div><h4>Propuesta</h4><p>Recibe por escrito el alcance, el plazo y el plan exacto. Sin letras pequeñas: usted decide con toda la información sobre la mesa.</p></div>
+    </div>
+    <div class="pstep rv">
+      <div><span class="n macro">03</span><span class="wk">SEMANAS 1–2</span></div>
+      <div><h4>Implementación</h4><p>Su primer empleado virtual queda operando en un máximo de dos semanas. Lo configuro, lo pruebo en su operación real y le entrego el control.</p></div>
+    </div>
+    <div class="pstep rv">
+      <div><span class="n macro">04</span><span class="wk">EN ADELANTE</span></div>
+      <div><h4>Operación</h4><p>Argos trabaja; usted supervisa con reportes claros. Ajustes continuos incluidos y comunicación directa conmigo, no con una mesa de ayuda.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 CONTACTO ============ -->
+<section id="contacto">
+  <div class="shead">
+    <span class="no mono">SEC. 05</span>
+    <h2 class="macro">Contacto directo</h2>
+    <span class="pg mono">PÁG. 05 / 05</span>
+  </div>
+  <div class="contact">
+    <div class="contact-copy">
+      <p class="rv">El siguiente paso es la reunión de diagnóstico: <mark>45 minutos, sin costo y sin compromiso</mark>. Al terminar sabrá exactamente qué procesos de su empresa pueden operar solos — y cuánto le está costando cada mes no haberlo resuelto.</p>
+      <p class="fn mono">LA AGENDA DE IMPLEMENTACIÓN SE ASIGNA POR ORDEN DE CONFIRMACIÓN.<br>ATENCIÓN PERSONAL DE ANTONIO FERNANDEZ — NO ES UN CALL CENTER.</p>
+    </div>
+    <div class="contact-acts mono">
+      <a class="solid" href="https://wa.me/5218717824648?text=Buen%20d%C3%ADa.%20Recib%C3%AD%20su%20tarjeta%20de%20presentaci%C3%B3n%20y%20me%20interesa%20agendar%20la%20reuni%C3%B3n%20de%20diagn%C3%B3stico." target="_blank" rel="noopener"><span>ESCRIBIR POR WHATSAPP</span><span class="arr">&gt;&gt;</span></a>
+      <a class="ghost" href="tel:+528717824648"><span>LLAMAR AHORA</span><span class="arr">&gt;&gt;</span></a>
+      <p class="hours">LUN—DOM · TORREÓN, COAHUILA · RESPUESTA AL INSTANTE</p>
+    </div>
+  </div>
+  <div class="cutline"><span class="mono">DOC. AF-2026 — CONSERVE ESTE ENLACE</span></div>
+  <footer class="mono">
+    <span>© MMXXVI ANTONIO FERNANDEZ</span>
+    <span>OPERADO POR ARGOS ™</span>
+    <span>TORREÓN, COAH. / MX</span>
+  </footer>
+</section>
+
+<div class="mobile-cta" role="navigation" aria-label="Contacto rápido">
+  <a href="https://wa.me/5218717824648?text=Buen%20d%C3%ADa.%20Recib%C3%AD%20su%20tarjeta%20de%20presentaci%C3%B3n%20y%20me%20interesa%20agendar%20la%20reuni%C3%B3n%20de%20diagn%C3%B3stico." target="_blank" rel="noopener">WHATSAPP &gt;&gt;</a>
+  <a href="tel:+528717824648">LLAMAR &gt;&gt;</a>
+</div>
+
+</main>
+
+<script>
+var t0=Date.now();
+var clockEl=document.getElementById('clock');
+setInterval(function(){
+  var s=Math.floor((Date.now()-t0)/1000);
+  var m=Math.floor(s/60);
+  var ss=s%60;
+  clockEl.textContent=String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0');
+},1000);
+
+var pct=document.getElementById('pct');
+addEventListener('scroll',function(){
+  var h=document.documentElement;
+  var p=Math.round(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)||0;
+  pct.textContent=String(p).padStart(3,'0')+'%';
+},{passive:true});
+
+setInterval(function(){
+  var s=document.getElementById('status');
+  s.style.opacity=s.style.opacity==='0.25'?'1':'0.25';
+},1100);
+
+var io=new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);}
+  });
+},{threshold:.12});
+document.querySelectorAll('.rv').forEach(function(el){io.observe(el);});
+</script>
+</body>
+</html>

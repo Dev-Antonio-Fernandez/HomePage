@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarjeta — Antonio Fernandez</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600&family=Archivo+Black&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<style>
+:root{
+  --paper:#F2F1EC;
+  --ink:#0B0B0A;
+  --grey:#55534E;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:#DBD9D2;font-family:'Archivo',sans-serif;color:var(--ink);
+  display:flex;flex-direction:column;align-items:center;gap:26px;
+  padding:40px 20px 70px;
+}
+.mono{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.09em;}
+
+.toolbar{
+  display:flex;gap:14px;align-items:center;
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.09em;
+}
+.toolbar button{
+  font-family:inherit;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  background:var(--ink);color:var(--paper);border:2px solid var(--ink);
+  padding:12px 28px;cursor:pointer;font-weight:700;
+}
+.toolbar button:hover{background:transparent;color:var(--ink);}
+.hint{font-size:10px;color:var(--grey);text-transform:uppercase;}
+
+.sheet{display:flex;gap:26px;flex-wrap:wrap;justify-content:center;}
+.card-wrap{text-align:center;}
+.card-wrap .lbl{font-size:10px;color:var(--grey);margin-bottom:10px;}
+
+/* ====== TARJETA: 90 × 50 mm ====== */
+.card{
+  width:90mm;height:50mm;background:var(--paper);position:relative;overflow:hidden;
+  box-shadow:0 14px 34px rgba(11,11,10,.22);
+  text-align:left;
+}
+@media screen and (min-width:900px){
+  .card{transform:scale(1.9);transform-origin:top center;}
+  .card-wrap{height:calc(50mm * 1.9 + 30px);width:calc(90mm * 1.9);}
+}
+
+/* grano sutil de imprenta */
+.card::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* marco fino + cruces de registro */
+.frame{position:absolute;inset:3mm;border:.35mm solid var(--ink);}
+.cross{position:absolute;font-family:'JetBrains Mono',monospace;font-size:2.6mm;color:var(--ink);line-height:1;}
+.cross.tl{top:1mm;left:1.4mm;}
+.cross.br{bottom:1mm;right:1.4mm;}
+
+/* ---- FRENTE ---- */
+.front .top{
+  position:absolute;top:5mm;left:6mm;right:6mm;
+  display:flex;justify-content:space-between;
+  font-size:1.9mm;color:var(--grey);
+}
+.front .name{
+  position:absolute;left:6mm;top:14.5mm;
+  font-family:'Archivo Black',sans-serif;text-transform:uppercase;
+  font-size:8.6mm;line-height:.92;letter-spacing:-.02em;color:var(--ink);
+}
+.front .name span{display:block;margin-left:7mm;}
+.front .rule{
+  position:absolute;left:6mm;right:6mm;bottom:11.2mm;
+  border-top:.3mm solid var(--ink);
+}
+.front .bottom{
+  position:absolute;bottom:5.4mm;left:6mm;right:6mm;
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-size:1.9mm;color:var(--ink);
+}
+.front .bottom .dim{color:var(--grey);}
+
+/* ---- REVERSO ---- */
+.back .qrbox{
+  position:absolute;left:6mm;top:50%;transform:translateY(-50%);
+  width:30mm;height:30mm;background:#FFFFFF;
+  display:flex;align-items:center;justify-content:center;
+  outline:.3mm solid var(--ink);outline-offset:1mm;
+}
+.back .qrbox svg{width:26mm;height:26mm;display:block;}
+.back .info{
+  position:absolute;left:43mm;right:6mm;top:13mm;
+  font-size:2mm;line-height:1.8;color:var(--ink);
+}
+.back .info .arrow{font-size:3mm;display:block;margin:.7mm 0;}
+.back .info .dim{color:var(--grey);}
+.back .strip{
+  position:absolute;left:3mm;right:3mm;bottom:3mm;height:6.5mm;
+  background:var(--ink);color:var(--paper);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 3mm;font-size:1.9mm;
+}
+
+/* ====== IMPRESIÓN: cada cara = una página al tamaño exacto ====== */
+@page{size:90mm 50mm;margin:0;}
+@media print{
+  body{background:none;padding:0;display:block;}
+  .toolbar,.card-wrap .lbl,.hint{display:none;}
+  .sheet{display:block;}
+  .card-wrap{height:auto;width:auto;}
+  .card{transform:none;box-shadow:none;page-break-after:always;}
+  .card::after{opacity:.05;}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button onclick="window.print()">IMPRIMIR / GUARDAR PDF &gt;&gt;</button>
+  <span class="hint">EN EL DIÁLOGO: TAMAÑO DE PAPEL = 90×50MM O "DEFINIDO POR PDF" · MÁRGENES = NINGUNO</span>
+</div>
+
+<div class="sheet">
+
+  <!-- FRENTE -->
+  <div class="card-wrap">
+    <p class="lbl mono">FRENTE — 90 × 50 MM</p>
+    <div class="card front">
+      <div class="frame"></div>
+      <span class="cross tl">+</span>
+      <span class="cross br">+</span>
+      <div class="top mono"><span></span><span>MX</span></div>
+      <div class="name">Antonio<span>Fernandez</span></div>
+      <div class="rule"></div>
+      <div class="bottom mono">
+        <span>AUTOMATIZACIÓN E IA PARA EMPRESAS</span>
+        <span class="dim">TORREÓN, COAH.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVERSO -->
+  <div class="card-wrap">
+    <p class="lbl mono">REVERSO — 90 × 50 MM</p>
+    <div class="card back">
+      <span class="cross tl">+</span>
+      <span class="cross br">+</span>
+      <div class="qrbox" id="qr"></div>
+      <div class="info mono">
+        <span class="dim">ESCANEE PARA ABRIR</span><br>
+        PÁGINA WEB
+        <span class="arrow">◀</span>
+        <span class="dim">CAPACIDADES · SISTEMA<br>TARIFAS · CONTACTO</span>
+      </div>
+      <div class="strip mono">
+        <span>A.FERNANDEZ ®</span>
+        <span>OPERADO POR ARGOS ™ · 24/7</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ⚠ CAMBIA ESTA URL POR LA REAL CUANDO LA PÁGINA ESTÉ DESPLEGADA */
+var URL_DESTINO = 'https://antoniofernandez.netlify.app';
+
+var qr = qrcode(0,'M');        // versión automática, corrección M
+qr.addData(URL_DESTINO);
+qr.make();
+document.getElementById('qr').innerHTML = qr.createSvgTag({cellSize:4,margin:0,scalable:true});
+/* módulos en tinta, fondo blanco puro para máxima lectura del escáner */
+var svg=document.querySelector('#qr svg');
+svg.querySelector('path').setAttribute('fill','#0B0B0A');
+</script>
+</body>
+</html>
