@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ANTONIO FERNANDEZ — Sistemas de Automatización e IA</title>
 <meta name="description" content="Sistemas de inteligencia artificial para empresas: atención 24/7, seguridad y automatización de procesos. Operado por ARGOS. Torreón, México.">
 <meta property="og:title" content="ANTONIO FERNANDEZ — Automatización e IA para empresas">
@@ -89,6 +89,7 @@ header .clock #clock{color:var(--ink);}
 .hero-grid{display:grid;grid-template-columns:1.55fr 1fr;}
 .hero-left{padding:72px 28px 84px;border-right:1px solid var(--hair);position:relative;}
 .hero-left h1{font-size:clamp(3.4rem,9.2vw,9.8rem);}
+.hero-left h1 .l1{display:block;}
 .hero-left h1 .l2{display:block;margin-left:.9em;}
 .hero-left .strap{
   margin-top:44px;max-width:46ch;
@@ -236,7 +237,27 @@ tfoot td.feat a{background:var(--ink);color:var(--paper);}
 tfoot td.feat a:hover{background:var(--paper);color:var(--ink);}
 .tbl-note{padding:14px 28px;font-size:.6rem;color:var(--grey);line-height:1.9;border-top:1px solid var(--hair);}
 .swipe-hint{display:none;padding:10px 24px 0;font-size:.6rem;color:var(--grey);}
-@media(max-width:880px){.swipe-hint{display:block;}}
+
+/* tarifas en fichas apiladas (solo celular) */
+.plans-mobile{display:none;}
+.plan-m{border-bottom:1px solid var(--hair);padding:28px 20px 32px;}
+.plan-m:last-of-type{border-bottom:none;}
+.plan-m .phead{display:flex;justify-content:space-between;align-items:baseline;font-size:.6rem;color:var(--grey);margin-bottom:10px;}
+.plan-m .price{font-family:'Archivo Black',sans-serif;font-size:2.5rem;letter-spacing:-.03em;line-height:1;}
+.plan-m .per{display:block;font-size:.58rem;color:var(--grey);margin-top:8px;}
+.plan-m ul{list-style:none;margin-top:16px;}
+.plan-m li{font-size:.82rem;padding:10px 0;border-top:1px solid rgba(11,11,10,.16);line-height:1.4;}
+.plan-m li::before{content:">> ";font-family:'JetBrains Mono',monospace;font-size:.68rem;}
+.plan-m .cta{display:block;margin-top:20px;border:2px solid var(--ink);padding:15px;text-align:center;text-decoration:none;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.09em;font-size:.68rem;font-weight:700;color:var(--ink);}
+.plan-m.feat{background:var(--ink);color:var(--paper);}
+.plan-m.feat .phead{color:#8B897F;}
+.plan-m.feat .per{color:#8B897F;}
+.plan-m.feat li{border-top-color:rgba(242,241,236,.2);}
+.plan-m.feat .cta{background:var(--paper);color:var(--ink);border-color:var(--paper);}
+@media(max-width:880px){
+  .tbl-scroll,.swipe-hint{display:none;}
+  .plans-mobile{display:block;}
+}
 
 /* ============ 04 PROCEDIMIENTO ============ */
 .steps{display:grid;grid-template-columns:repeat(2,1fr);}
@@ -306,7 +327,42 @@ footer{
 .mobile-cta a+a{border-left:1px solid rgba(242,241,236,.3);}
 @media(max-width:760px){
   .mobile-cta{display:flex;}
-  footer{padding-bottom:78px;}
+  .mobile-cta a{padding:16px 8px calc(16px + env(safe-area-inset-bottom));}
+  footer{padding-bottom:92px;}
+}
+
+/* ============ AJUSTE FINO CELULAR ============ */
+@media(max-width:760px){
+  header{padding:12px 20px;}
+  .hero .meta{padding:12px 20px;font-size:.55rem;}
+  .hero-left{padding:46px 20px 54px;}
+  .hero-left h1 .l1{font-size:16.8vw;}
+  .hero-left h1 .l2{font-size:13vw;margin-left:0;}
+  .hero-left .strap{margin-top:30px;font-size:1.06rem;}
+  .hero-right .doc{padding:20px;}
+  .toc{padding:20px;}
+  .band{padding:30px 20px 24px;}
+  .shead{padding:14px 20px;}
+  .shead h2{font-size:1.8rem;}
+  .svc-row{grid-template-columns:1fr;padding:26px 20px;row-gap:8px;}
+  .svc-row h3{font-size:1.5rem;}
+  .svc-row p{grid-column:1;max-width:none;}
+  .fig{padding:34px 20px 40px;}
+  .argos-copy{padding:44px 20px 50px;}
+  .argos-copy p{font-size:.95rem;}
+  .argos-specs .srow{padding:18px 20px;}
+  .argos-specs dd{font-size:1.05rem;}
+  .tbl-note{padding:12px 20px;}
+  .pstep{grid-template-columns:1fr;row-gap:8px;padding:30px 20px;}
+  .pstep>div:first-child{display:flex;align-items:baseline;gap:12px;}
+  .pstep .n{font-size:1.9rem;}
+  .pstep .wk{margin-top:0;}
+  .pstep p{max-width:none;}
+  .contact-copy{padding:44px 20px 50px;}
+  .contact-acts a{padding:24px 20px;}
+  .contact-acts .hours{padding:16px 20px;}
+  .cutline{margin:0 20px;}
+  footer{padding-left:20px;padding-right:20px;}
 }
 
 /* reveal */
@@ -347,7 +403,7 @@ footer{
     <div class="hero-left">
       <span class="hcross mono" style="top:22px;right:22px;">+</span>
       <span class="hcross mono" style="bottom:22px;left:22px;">+</span>
-      <h1 class="macro">Antonio<span class="l2">Fernandez</span></h1>
+      <h1 class="macro"><span class="l1">Antonio</span><span class="l2">Fernandez</span></h1>
       <p class="strap">Diseño e instalo sistemas de inteligencia artificial que atienden, venden y vigilan la operación de su empresa <mark>las 24 horas, los 365 días</mark> — siempre bajo supervisión humana.</p>
     </div>
     <div class="hero-right">
@@ -511,6 +567,50 @@ footer{
     </tfoot>
   </table>
   </div>
+
+  <div class="plans-mobile">
+    <div class="plan-m">
+      <div class="phead mono"><span>[ P-01 · INICIAL ]</span><span>P-01</span></div>
+      <div class="price">$4,900</div>
+      <span class="per mono">MXN / MES *</span>
+      <ul>
+        <li>1 empleado virtual (WhatsApp)</li>
+        <li>1 proceso automatizado</li>
+        <li>Reporte mensual</li>
+        <li>Soporte en horario laboral</li>
+      </ul>
+      <a class="cta" href="https://wa.me/5218717824648?text=Buen%20d%C3%ADa.%20Me%20interesa%20el%20plan%20INICIAL%20(%244%2C900%20MXN%2Fmes)%20y%20quiero%20agendar%20la%20reuni%C3%B3n%20de%20diagn%C3%B3stico." target="_blank" rel="noopener">SOLICITAR &gt;&gt;</a>
+    </div>
+    <div class="plan-m feat">
+      <div class="phead mono"><span>[ P-02 · OPERATIVO ]</span><span>★ EL MÁS CONTRATADO</span></div>
+      <div class="price">$9,900</div>
+      <span class="per mono">MXN / MES *</span>
+      <ul>
+        <li>Hasta 3 empleados virtuales</li>
+        <li>Procesos clave automatizados</li>
+        <li>Monitoreo y alertas en tiempo real</li>
+        <li>Seguridad y respaldos básicos</li>
+        <li>Reporte semanal + análisis</li>
+        <li>Soporte prioritario</li>
+      </ul>
+      <a class="cta" href="https://wa.me/5218717824648?text=Buen%20d%C3%ADa.%20Me%20interesa%20el%20plan%20OPERATIVO%20(%249%2C900%20MXN%2Fmes)%20y%20quiero%20agendar%20la%20reuni%C3%B3n%20de%20diagn%C3%B3stico." target="_blank" rel="noopener">SOLICITAR &gt;&gt;</a>
+    </div>
+    <div class="plan-m">
+      <div class="phead mono"><span>[ P-03 · TOTAL ]</span><span>P-03</span></div>
+      <div class="price">$19,900</div>
+      <span class="per mono">MXN / MES *</span>
+      <ul>
+        <li>Empleados virtuales sin límite</li>
+        <li>Automatización a la medida</li>
+        <li>Monitoreo en tiempo real</li>
+        <li>Seguridad y respaldos completos</li>
+        <li>Reporte semanal + sesión estratégica</li>
+        <li>Línea directa 24/7</li>
+      </ul>
+      <a class="cta" href="https://wa.me/5218717824648?text=Buen%20d%C3%ADa.%20Me%20interesa%20el%20plan%20TOTAL%20(%2419%2C900%20MXN%2Fmes)%20y%20quiero%20agendar%20la%20reuni%C3%B3n%20de%20diagn%C3%B3stico." target="_blank" rel="noopener">SOLICITAR &gt;&gt;</a>
+    </div>
+  </div>
+
   <p class="tbl-note mono">* PRECIOS MÁS IVA · SIN PLAZO FORZOSO · IMPLEMENTACIÓN INICIAL INCLUIDA CON COMPROMISO ANUAL.<br>REFERENCIA: EL PLAN OPERATIVO EQUIVALE A UNA FRACCIÓN DEL COSTO MENSUAL DE UN SOLO EMPLEADO — Y CUBRE LA OPERACIÓN LAS 24 HORAS.</p>
 </section>
 
