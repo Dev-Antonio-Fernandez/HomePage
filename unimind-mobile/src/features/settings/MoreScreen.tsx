@@ -1,0 +1,241 @@
+import React, { useCallback, useEffect, useState } from 'react';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { Screen } from '../../components/ui/Screen';
+import { Text } from '../../components/ui/Text';
+import { Card } from '../../components/ui/Card';
+import { Input } from '../../components/ui/Input';
+import { Button } from '../../components/ui/Button';
+import { SectionHeader } from '../../components/ui/SectionHeader';
+import { colors, spacing, radius } from '../../theme';
+import { Settings, Tasks } from '../../db';
+import type { TaskWithSubject } from '../../db/repositories/tasks';
+import {
+  loadConfig,
+  saveConfig,
+  getApiKey,
+  setApiKey,
+  AI_PRESETS,
+  type AIConfig,
+} from '../../ai';
+
+export function MoreScreen() {
+  const [name, setName] = useState('');
+  const [cfg, setCfg] = useState<AIConfig | null>(null);
+  const [apiKey, setKey] = useState('');
+  const [keySaved, setKeySaved] = useState(false);
+  const [tasks, setTasks] = useState<TaskWithSubject[]>([]);
+  const [newTask, setNewTask] = useState('');
+
+  const load = useCallback(async () => {
+    const [n, c, k, t] = await Promise.all([
+      Settings.getSetting('USER_NAME'),
+      loadConfig(),
+      getApiKey(),
+      Tasks.pendingTasks(),
+    ]);
+    setName(n ?? '');
+    setCfg(c);
+    setKeySaved(!!k);
+    setKey('');
+    setTasks(t);
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [load]),
+  );
+
+  const saveName = async () => {
+    await Settings.setSetting('USER_NAME', name.trim());
+    Alert.alert('Guardado', 'Tu nombre se actualizó.');
+  };
+
+  const applyPreset = (key: string) => {
+    const p = AI_PRESETS[key];
+    if (!p || !cfg) return;
+    setCfg({
+      ...cfg,
+      provider: key,
+      baseUrl: p.baseUrl,
+      modelFast: p.fast,
+      modelMain: p.main,
+      modelAdvanced: p.advanced,
+    });
+  };
+
+  const saveAI = async () => {
+    if (!cfg) return;
+    await saveConfig(cfg);
+    if (apiKey.trim().length > 0) {
+      await setApiKey(apiKey.trim());
+      setKeySaved(true);
+      setKey('');
+    }
+    Alert.alert('Guardado', 'Configuración de IA actualizada.');
+  };
+
+  const clearKey = async () => {
+    await setApiKey('');
+    setKeySaved(false);
+    Alert.alert('Listo', 'API key eliminada del dispositivo.');
+  };
+
+  const addTask = async () => {
+    if (newTask.trim().length === 0) return;
+    await Tasks.createTask({ title: newTask.trim() });
+    setNewTask('');
+    load();
+  };
+
+  const completeTask = async (id: string) => {
+    await Tasks.toggleTask(id, true);
+    load();
+  };
+
+  return (
+    <Screen onRefresh={load}>
+      <Text variant="title">Más</Text>
+
+      {/* Perfil */}
+      <View style={{ gap: spacing.sm }}>
+        <SectionHeader title="Perfil" />
+        <Input label="Tu nombre" value={name} onChangeText={setName} placeholder="¿Cómo te llamas?" />
+        <Button label="Guardar nombre" onPress={saveName} variant="secondary" />
+      </View>
+
+      {/* IA */}
+      <View style={{ gap: spacing.sm }}>
+        <SectionHeader title="Inteligencia artificial" />
+        <Text variant="faint">
+          Compatible con OpenAI, DeepSeek, Kimi (Moonshot) y cualquier API estilo OpenAI.
+        </Text>
+
+        <View style={styles.presets}>
+          {Object.entries(AI_PRESETS).map(([key, p]) => (
+            <Pressable
+              key={key}
+              onPress={() => applyPreset(key)}
+              style={[
+                styles.preset,
+                cfg?.provider === key && styles.presetActive,
+              ]}
+            >
+              <Text
+                weight="600"
+                color={cfg?.provider === key ? colors.white : colors.textMuted}
+              >
+                {p.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        {cfg ? (
+          <>
+            <Input
+              label="URL base"
+              value={cfg.baseUrl}
+              onChangeText={(v) => setCfg({ ...cfg, baseUrl: v })}
+              autoCapitalize="none"
+            />
+            <Input
+              label="Modelo rápido (barato/nano)"
+              value={cfg.modelFast}
+              onChangeText={(v) => setCfg({ ...cfg, modelFast: v })}
+              autoCapitalize="none"
+            />
+            <Input
+              label="Modelo principal (mini)"
+              value={cfg.modelMain}
+              onChangeText={(v) => setCfg({ ...cfg, modelMain: v })}
+              autoCapitalize="none"
+            />
+            <Input
+              label="Modelo avanzado (opcional)"
+              value={cfg.modelAdvanced}
+              onChangeText={(v) => setCfg({ ...cfg, modelAdvanced: v })}
+              autoCapitalize="none"
+            />
+          </>
+        ) : null}
+
+        <Input
+          label={keySaved ? 'API key (ya configurada — escribe para reemplazar)' : 'API key'}
+          value={apiKey}
+          onChangeText={setKey}
+          placeholder={keySaved ? '•••••••• guardada de forma segura' : 'sk-...'}
+          secureTextEntry
+          autoCapitalize="none"
+          hint="Se guarda cifrada en el dispositivo (SecureStore), nunca en la base de datos."
+        />
+
+        <Button label="Guardar configuración de IA" onPress={saveAI} />
+        {keySaved ? (
+          <Button label="Borrar API key" onPress={clearKey} variant="ghost" />
+        ) : null}
+      </View>
+
+      {/* Tareas */}
+      <View style={{ gap: spacing.sm }}>
+        <SectionHeader title="Todas las tareas pendientes" />
+        <View style={styles.addRow}>
+          <View style={styles.flex}>
+            <Input value={newTask} onChangeText={setNewTask} placeholder="Nueva tarea rápida" />
+          </View>
+          <Button label="+" onPress={addTask} fullWidth={false} style={styles.addBtn} />
+        </View>
+        {tasks.length === 0 ? (
+          <Card><Text variant="muted">Sin tareas pendientes. 🎉</Text></Card>
+        ) : (
+          tasks.map((t) => (
+            <Card key={t.id} padded={false}>
+              <Pressable style={styles.taskRow} onPress={() => completeTask(t.id)}>
+                <View style={styles.checkbox} />
+                <View style={styles.flex}>
+                  <Text variant="body" weight="600">{t.title}</Text>
+                  {t.subject_name ? <Text variant="faint">{t.subject_name}</Text> : null}
+                </View>
+                {t.source === 'ia' ? <Text variant="faint">IA</Text> : null}
+              </Pressable>
+            </Card>
+          ))
+        )}
+      </View>
+
+      {/* Acerca de */}
+      <Card>
+        <Text variant="subheading">UniMind Mobile</Text>
+        <Text variant="muted" style={{ marginTop: spacing.xs }}>
+          App personal, local-first y sin fines de lucro. Tus datos viven en tu
+          teléfono; la IA solo se usa cuando tú la pides.
+        </Text>
+      </Card>
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  presets: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  preset: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  presetActive: { backgroundColor: colors.primaryStrong, borderColor: colors.primaryStrong },
+  addRow: { flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-end' },
+  addBtn: { width: 50, height: 50 },
+  taskRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.lg },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: colors.textFaint,
+  },
+});
