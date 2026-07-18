@@ -32,10 +32,16 @@ export function SubjectFormScreen() {
   const [blocks, setBlocks] = useState<ScheduleBlock[]>([]);
   const [saving, setSaving] = useState(false);
 
-  // Estado del bloque de horario a añadir
-  const [bDay, setBDay] = useState(1);
+  // Estado del bloque de horario a añadir (varios días a la vez)
+  const [bDays, setBDays] = useState<number[]>([]);
   const [bStart, setBStart] = useState('');
   const [bEnd, setBEnd] = useState('');
+
+  const toggleDay = (i: number) => {
+    setBDays((prev) =>
+      prev.includes(i) ? prev.filter((d) => d !== i) : [...prev, i],
+    );
+  };
 
   const loadBlocks = useCallback(async (id: string) => {
     setBlocks(await Schedule.listBlocksForSubject(id));
@@ -92,16 +98,24 @@ export function SubjectFormScreen() {
       );
       return;
     }
+    if (bDays.length === 0) {
+      Alert.alert('Elige al menos un día', 'Toca los días en que tienes esta clase.');
+      return;
+    }
     if (!/^\d{1,2}:\d{2}$/.test(bStart) || !/^\d{1,2}:\d{2}$/.test(bEnd)) {
       Alert.alert('Hora inválida', 'Usa el formato HH:MM (ej. 10:00).');
       return;
     }
-    await Schedule.addBlock({
-      subject_id: editingId,
-      weekday: bDay,
-      start_time: bStart,
-      end_time: bEnd,
-    });
+    // Crea un bloque por cada día seleccionado con el mismo horario.
+    for (const day of bDays) {
+      await Schedule.addBlock({
+        subject_id: editingId,
+        weekday: day,
+        start_time: bStart,
+        end_time: bEnd,
+      });
+    }
+    setBDays([]);
     setBStart('');
     setBEnd('');
     loadBlocks(editingId);
@@ -208,24 +222,30 @@ export function SubjectFormScreen() {
 
             <Card>
               <Text variant="label">Agregar bloque</Text>
+              <Text variant="faint">
+                Toca todos los días que tengan este mismo horario.
+              </Text>
               <View style={styles.dayPicker}>
-                {WEEKDAYS_SHORT.map((d, i) => (
-                  <Pressable
-                    key={d}
-                    onPress={() => setBDay(i)}
-                    style={[styles.dayBtn, bDay === i && styles.dayBtnActive]}
-                  >
-                    <Text
-                      style={{
-                        color: bDay === i ? colors.white : colors.textMuted,
-                        fontSize: 12,
-                      }}
-                      weight="600"
+                {WEEKDAYS_SHORT.map((d, i) => {
+                  const on = bDays.includes(i);
+                  return (
+                    <Pressable
+                      key={d}
+                      onPress={() => toggleDay(i)}
+                      style={[styles.dayBtn, on && styles.dayBtnActive]}
                     >
-                      {d}
-                    </Text>
-                  </Pressable>
-                ))}
+                      <Text
+                        style={{
+                          color: on ? colors.white : colors.textMuted,
+                          fontSize: 12,
+                        }}
+                        weight="600"
+                      >
+                        {d}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
               </View>
               <View style={styles.rowInputs}>
                 <View style={styles.flex}>
@@ -235,7 +255,16 @@ export function SubjectFormScreen() {
                   <Input label="Fin" value={bEnd} onChangeText={setBEnd} placeholder="11:30" />
                 </View>
               </View>
-              <Button label="Agregar al horario" onPress={addBlock} variant="secondary" style={{ marginTop: spacing.sm }} />
+              <Button
+                label={
+                  bDays.length > 1
+                    ? `Agregar a ${bDays.length} días`
+                    : 'Agregar al horario'
+                }
+                onPress={addBlock}
+                variant="secondary"
+                style={{ marginTop: spacing.sm }}
+              />
             </Card>
           </>
         )}

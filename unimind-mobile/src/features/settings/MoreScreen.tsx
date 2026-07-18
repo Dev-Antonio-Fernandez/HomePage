@@ -8,8 +8,9 @@ import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { colors, spacing, radius } from '../../theme';
-import { Settings, Tasks } from '../../db';
+import { Settings, Subjects, Tasks } from '../../db';
 import type { TaskWithSubject } from '../../db/repositories/tasks';
+import { seedMySchedule } from './seed';
 import {
   loadConfig,
   saveConfig,
@@ -50,6 +51,29 @@ export function MoreScreen() {
   const saveName = async () => {
     await Settings.setSetting('USER_NAME', name.trim());
     Alert.alert('Guardado', 'Tu nombre se actualizó.');
+  };
+
+  const importSchedule = async () => {
+    const existing = await Subjects.listSubjects();
+    const run = async () => {
+      const n = await seedMySchedule();
+      Alert.alert(
+        'Horario importado',
+        `Se agregaron ${n} materias con sus horarios. Ajusta el límite de faltas de cada una en su pantalla de edición.`,
+      );
+    };
+    if (existing.length > 0) {
+      Alert.alert(
+        'Ya tienes materias',
+        'Esto agregará tus materias otra vez (pueden quedar duplicadas). ¿Continuar?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Agregar', onPress: run },
+        ],
+      );
+    } else {
+      run();
+    }
   };
 
   const applyPreset = (key: string) => {
@@ -103,6 +127,18 @@ export function MoreScreen() {
         <SectionHeader title="Perfil" />
         <Input label="Tu nombre" value={name} onChangeText={setName} placeholder="¿Cómo te llamas?" />
         <Button label="Guardar nombre" onPress={saveName} variant="secondary" />
+      </View>
+
+      {/* Importar horario */}
+      <View style={{ gap: spacing.sm }}>
+        <SectionHeader title="Importar mi horario" />
+        <Card>
+          <Text variant="muted">
+            Carga tus 6 materias de Mercadotecnia con sus horarios de un solo
+            toque. Después ajusta el límite de faltas de cada una.
+          </Text>
+        </Card>
+        <Button label="Importar horario (Mercadotecnia)" onPress={importSchedule} />
       </View>
 
       {/* IA */}
