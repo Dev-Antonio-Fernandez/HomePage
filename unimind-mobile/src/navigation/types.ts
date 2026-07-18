@@ -18,4 +18,5 @@ export type RootStackParamList = {
   Explain: { subjectId: string; question?: string };
   Faltas: undefined;
   Tasks: undefined;
+  RecordClass: { sessionId: string };
 };

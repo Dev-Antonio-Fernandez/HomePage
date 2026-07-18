@@ -18,6 +18,12 @@ import {
   setApiKey,
   AI_PRESETS,
   type AIConfig,
+  loadSttConfig,
+  saveSttConfig,
+  getSttKey,
+  setSttKey,
+  STT_PRESETS,
+  type STTConfig,
 } from '../../ai';
 
 export function MoreScreen() {
@@ -25,20 +31,28 @@ export function MoreScreen() {
   const [cfg, setCfg] = useState<AIConfig | null>(null);
   const [apiKey, setKey] = useState('');
   const [keySaved, setKeySaved] = useState(false);
+  const [stt, setStt] = useState<STTConfig | null>(null);
+  const [sttKey, setSttKeyInput] = useState('');
+  const [sttKeySaved, setSttKeySaved] = useState(false);
   const [tasks, setTasks] = useState<TaskWithSubject[]>([]);
   const [newTask, setNewTask] = useState('');
 
   const load = useCallback(async () => {
-    const [n, c, k, t] = await Promise.all([
+    const [n, c, k, sc, sk, t] = await Promise.all([
       Settings.getSetting('USER_NAME'),
       loadConfig(),
       getApiKey(),
+      loadSttConfig(),
+      getSttKey(),
       Tasks.pendingTasks(),
     ]);
     setName(n ?? '');
     setCfg(c);
     setKeySaved(!!k);
     setKey('');
+    setStt(sc);
+    setSttKeySaved(!!sk);
+    setSttKeyInput('');
     setTasks(t);
   }, []);
 
@@ -104,6 +118,29 @@ export function MoreScreen() {
     await setApiKey('');
     setKeySaved(false);
     Alert.alert('Listo', 'API key eliminada del dispositivo.');
+  };
+
+  const applySttPreset = (key: string) => {
+    const p = STT_PRESETS[key];
+    if (!p || !stt) return;
+    setStt({ ...stt, provider: key, baseUrl: p.baseUrl, model: p.model });
+  };
+
+  const saveStt = async () => {
+    if (!stt) return;
+    await saveSttConfig(stt);
+    if (sttKey.trim().length > 0) {
+      await setSttKey(sttKey.trim());
+      setSttKeySaved(true);
+      setSttKeyInput('');
+    }
+    Alert.alert('Guardado', 'Configuración de transcripción actualizada.');
+  };
+
+  const clearSttKey = async () => {
+    await setSttKey('');
+    setSttKeySaved(false);
+    Alert.alert('Listo', 'API key de transcripción eliminada.');
   };
 
   const addTask = async () => {
@@ -210,6 +247,67 @@ export function MoreScreen() {
         <Button label="Guardar configuración de IA" onPress={saveAI} />
         {keySaved ? (
           <Button label="Borrar API key" onPress={clearKey} variant="ghost" />
+        ) : null}
+      </View>
+
+      {/* Transcripción de audio */}
+      <View style={{ gap: spacing.sm }}>
+        <SectionHeader title="Transcripción de clases (audio)" />
+        <Text variant="faint">
+          Para grabar clases y convertirlas en notas. Groq es barato y rápido.
+        </Text>
+
+        <View style={styles.presets}>
+          {Object.entries(STT_PRESETS).map(([key, p]) => (
+            <Pressable
+              key={key}
+              onPress={() => applySttPreset(key)}
+              style={[styles.preset, stt?.provider === key && styles.presetActive]}
+            >
+              <Text
+                weight="600"
+                color={stt?.provider === key ? colors.white : colors.textMuted}
+              >
+                {p.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        {stt ? (
+          <>
+            <Input
+              label="URL base"
+              value={stt.baseUrl}
+              onChangeText={(v) => setStt({ ...stt, baseUrl: v })}
+              autoCapitalize="none"
+            />
+            <Input
+              label="Modelo de transcripción"
+              value={stt.model}
+              onChangeText={(v) => setStt({ ...stt, model: v })}
+              autoCapitalize="none"
+            />
+          </>
+        ) : null}
+
+        <Input
+          label={
+            sttKeySaved
+              ? 'API key de transcripción (ya configurada — escribe para reemplazar)'
+              : 'API key de transcripción'
+          }
+          value={sttKey}
+          onChangeText={setSttKeyInput}
+          placeholder={sttKeySaved ? '•••••••• guardada' : 'gsk_...'}
+          secureTextEntry
+          autoCapitalize="none"
+          hint="Se guarda cifrada en el dispositivo (SecureStore)."
+        />
+
+        <Button label="Guardar transcripción" onPress={saveStt} />
+        {sttKeySaved ? (
+          <Button label="Borrar API key de transcripción" onPress={clearSttKey} variant="ghost" />
         ) : null}
       </View>
 

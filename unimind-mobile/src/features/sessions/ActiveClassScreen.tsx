@@ -149,6 +149,11 @@ export function ActiveClassScreen() {
         )}
       </View>
 
+      <Button
+        label="🎙️  Grabar clase y hacer notas con IA"
+        onPress={() => nav.navigate('RecordClass', { sessionId })}
+      />
+
       {session?.status !== 'cerrada' ? (
         <Button
           label="Cerrar clase"

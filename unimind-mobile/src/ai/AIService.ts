@@ -10,8 +10,9 @@ import {
   questionsPrompt,
   detectTasksPrompt,
   explainPrompt,
+  structurePrompt,
 } from './prompts';
-import { getDb, Notes, Sessions, Subjects } from '../db';
+import { getDb, Notes, Sessions, Subjects, Tasks } from '../db';
 import { newId } from '../utils/ids';
 import type { NoteType } from '../db/types';
 
@@ -223,6 +224,77 @@ export async function detectTasks(sessionId: string): Promise<DetectedTask[]> {
   );
   const parsed = parseJson<{ tasks?: DetectedTask[] }>(out);
   return (parsed?.tasks ?? []).filter((t) => t.title);
+}
+
+export interface StructuredResult {
+  summary: string;
+  notesAdded: number;
+  tasksAdded: number;
+}
+
+const ALLOWED_NOTE_TYPES: NoteType[] = ['idea', 'duda', 'formula', 'ejemplo'];
+
+// A partir de una transcripción: genera resumen, y reparte el contenido en
+// notas de estudio y tareas (según lo que dijo el profesor).
+export async function structureTranscript(
+  sessionId: string,
+  transcript: string,
+): Promise<StructuredResult> {
+  const session = await Sessions.getSession(sessionId);
+  if (!session) throw new AIError('Sesión no encontrada.');
+  const subject = await Subjects.getSubject(session.subject_id);
+
+  const p = structurePrompt({
+    subject: subject?.name ?? 'Materia',
+    transcript,
+  });
+  const out = await chat(
+    [
+      { role: 'system', content: p.system },
+      { role: 'user', content: p.user },
+    ],
+    'main',
+    { action: 'structureTranscript', subjectId: session.subject_id, sessionId },
+  );
+
+  const parsed = parseJson<{
+    summary?: string;
+    notes?: { type?: string; text?: string }[];
+    tasks?: { title?: string; due_date?: string | null }[];
+  }>(out);
+
+  const summary = parsed?.summary?.trim() ?? '';
+  if (summary) await Sessions.setSessionSummary(sessionId, summary);
+
+  let notesAdded = 0;
+  for (const n of parsed?.notes ?? []) {
+    if (!n.text) continue;
+    const type = (ALLOWED_NOTE_TYPES as string[]).includes(n.type ?? '')
+      ? (n.type as NoteType)
+      : 'idea';
+    await Notes.createNote({
+      subject_id: session.subject_id,
+      session_id: sessionId,
+      type,
+      raw_text: n.text,
+    });
+    notesAdded++;
+  }
+
+  let tasksAdded = 0;
+  for (const t of parsed?.tasks ?? []) {
+    if (!t.title) continue;
+    await Tasks.createTask({
+      subject_id: session.subject_id,
+      session_id: sessionId,
+      title: t.title,
+      due_date: t.due_date ?? null,
+      source: 'ia',
+    });
+    tasksAdded++;
+  }
+
+  return { summary, notesAdded, tasksAdded };
 }
 
 export async function explainDoubt(params: {

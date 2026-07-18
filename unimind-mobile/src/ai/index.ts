@@ -1,5 +1,6 @@
 export * as AIService from './AIService';
 export { AIError, MissingKeyError } from './AIService';
+export { transcribeAudio, MissingSttKeyError } from './transcription';
 export {
   getApiKey,
   setApiKey,
@@ -9,4 +10,12 @@ export {
   AI_PRESETS,
   AI_DEFAULTS,
   type AIConfig,
+  getSttKey,
+  setSttKey,
+  hasSttKey,
+  loadSttConfig,
+  saveSttConfig,
+  STT_PRESETS,
+  STT_DEFAULTS,
+  type STTConfig,
 } from './config';

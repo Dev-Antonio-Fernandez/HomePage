@@ -94,4 +94,34 @@ Responde en español con explicación clara, un ejemplo y 3 preguntas cortas par
   return { system, user };
 }
 
+// Clasifica una transcripción de clase en notas de estudio vs tareas.
+export function structurePrompt(params: {
+  subject: string;
+  transcript: string;
+}) {
+  const system =
+    'Eres un asistente académico que organiza la transcripción de una clase. ' +
+    'Distingues entre conocimiento para estudiar (notas) y cosas por hacer (tareas). ' +
+    'No inventas nada que no esté en la transcripción.';
+  const user = `Materia: ${params.subject}.
+Transcripción de la clase:
+"""
+${params.transcript}
+"""
+
+Analiza la transcripción y devuelve SOLO un JSON válido con esta forma exacta:
+{
+  "summary": "resumen breve de la clase en 5 puntos",
+  "notes": [{"type": "idea|duda|formula|ejemplo", "text": "..."}],
+  "tasks": [{"title": "...", "due_date": null}]
+}
+
+Reglas:
+- "notes": conceptos, explicaciones, fórmulas o ejemplos importantes para estudiar.
+- "tasks": SOLO cosas que el profesor pidió hacer o entregar (tareas, ejercicios, lecturas, entregas, exámenes). Si menciona una fecha, ponla en due_date con formato YYYY-MM-DD; si no, null.
+- Si no hay tareas claras, devuelve "tasks": [].
+- Responde en español. No agregues texto fuera del JSON.`;
+  return { system, user };
+}
+
 export { NOTE_TYPE_LABEL };

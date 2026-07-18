@@ -9,8 +9,19 @@
     "backgroundColor": "#0A0A0D",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.unimind.mobile"
+      "bundleIdentifier": "com.unimind.mobile",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "UniMind usa el micrófono para grabar tus clases y convertirlas en notas."
+      }
     },
+    "plugins": [
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "UniMind usa el micrófono para grabar tus clases y convertirlas en notas."
+        }
+      ]
+    ],
     "android": {
       "package": "com.unimind.mobile",
       "adaptiveIcon": {

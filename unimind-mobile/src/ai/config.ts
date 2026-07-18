@@ -50,6 +50,7 @@ export const AI_PRESETS: Record<
 };
 
 const API_KEY_STORE = 'unimind_ai_api_key';
+const STT_KEY_STORE = 'unimind_stt_api_key';
 
 export async function getApiKey(): Promise<string | null> {
   try {
@@ -70,6 +71,87 @@ export async function setApiKey(key: string): Promise<void> {
 export async function hasApiKey(): Promise<boolean> {
   const k = await getApiKey();
   return !!k && k.length > 0;
+}
+
+// ---- Transcripción (voz -> texto), configurable aparte del chat ----
+export const STT_KEYS = {
+  BASE_URL: 'STT_BASE_URL',
+  MODEL: 'STT_MODEL',
+  PROVIDER: 'STT_PROVIDER',
+} as const;
+
+// Groq es barato y rápido para Whisper; compatible con la API de OpenAI.
+export const STT_DEFAULTS = {
+  BASE_URL: 'https://api.groq.com/openai/v1',
+  MODEL: 'whisper-large-v3-turbo',
+  PROVIDER: 'groq',
+};
+
+export const STT_PRESETS: Record<
+  string,
+  { label: string; baseUrl: string; model: string }
+> = {
+  groq: {
+    label: 'Groq (barato)',
+    baseUrl: 'https://api.groq.com/openai/v1',
+    model: 'whisper-large-v3-turbo',
+  },
+  openai: {
+    label: 'OpenAI Whisper',
+    baseUrl: 'https://api.openai.com/v1',
+    model: 'whisper-1',
+  },
+};
+
+export interface STTConfig {
+  baseUrl: string;
+  model: string;
+  provider: string;
+}
+
+export async function getSttKey(): Promise<string | null> {
+  try {
+    return await SecureStore.getItemAsync(STT_KEY_STORE);
+  } catch {
+    return null;
+  }
+}
+
+export async function setSttKey(key: string): Promise<void> {
+  if (key.trim().length === 0) {
+    await SecureStore.deleteItemAsync(STT_KEY_STORE);
+    return;
+  }
+  await SecureStore.setItemAsync(STT_KEY_STORE, key.trim());
+}
+
+export async function hasSttKey(): Promise<boolean> {
+  const k = await getSttKey();
+  return !!k && k.length > 0;
+}
+
+export async function loadSttConfig(): Promise<STTConfig> {
+  const [baseUrl, model, provider] = await Promise.all([
+    Settings.getSetting(STT_KEYS.BASE_URL),
+    Settings.getSetting(STT_KEYS.MODEL),
+    Settings.getSetting(STT_KEYS.PROVIDER),
+  ]);
+  return {
+    baseUrl: baseUrl || STT_DEFAULTS.BASE_URL,
+    model: model || STT_DEFAULTS.MODEL,
+    provider: provider || STT_DEFAULTS.PROVIDER,
+  };
+}
+
+export async function saveSttConfig(cfg: Partial<STTConfig>): Promise<void> {
+  const entries: [string, string | undefined][] = [
+    [STT_KEYS.BASE_URL, cfg.baseUrl],
+    [STT_KEYS.MODEL, cfg.model],
+    [STT_KEYS.PROVIDER, cfg.provider],
+  ];
+  for (const [k, v] of entries) {
+    if (v !== undefined) await Settings.setSetting(k, v);
+  }
 }
 
 export interface AIConfig {

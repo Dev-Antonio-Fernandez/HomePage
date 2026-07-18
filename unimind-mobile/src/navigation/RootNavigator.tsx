@@ -17,6 +17,7 @@ import { NewNoteScreen } from '../features/notes/NewNoteScreen';
 import { ExplainScreen } from '../features/study/ExplainScreen';
 import { FaltasScreen } from '../features/attendance/FaltasScreen';
 import { TasksScreen } from '../features/tasks/TasksScreen';
+import { RecordClassScreen } from '../features/sessions/RecordClassScreen';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -90,6 +91,11 @@ export function RootNavigator() {
         name="Tasks"
         component={TasksScreen}
         options={{ title: 'Pendientes' }}
+      />
+      <Stack.Screen
+        name="RecordClass"
+        component={RecordClassScreen}
+        options={{ title: 'Grabar clase' }}
       />
     </Stack.Navigator>
   );
