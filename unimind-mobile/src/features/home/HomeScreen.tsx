@@ -326,14 +326,19 @@ export function HomeScreen() {
       <View style={styles.section}>
         <SectionHeader title="Resumen del día" />
         <View style={styles.statRow}>
-          <StatTile label="Clases hoy" value={String(data?.classes.length ?? 0)} icon={<Text>🗓️</Text>} />
           <StatTile
             label="Faltas restantes"
             value={`${data?.remaining ?? 0}/${data?.limitTotal ?? 0}`}
             valueColor={data?.worstRisk}
             icon={<Text>✅</Text>}
+            onPress={() => nav.navigate('Faltas')}
           />
-          <StatTile label="Tareas" value={String(data?.pending.length ?? 0)} icon={<Text>📋</Text>} />
+          <StatTile
+            label="Tareas pendientes"
+            value={String(data?.pending.length ?? 0)}
+            icon={<Text>📋</Text>}
+            onPress={() => nav.navigate('Tasks')}
+          />
         </View>
       </View>
 

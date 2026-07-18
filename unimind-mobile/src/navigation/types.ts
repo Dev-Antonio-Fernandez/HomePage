@@ -16,4 +16,6 @@ export type RootStackParamList = {
   CloseClass: { sessionId: string };
   NewNote: { subjectId?: string; sessionId?: string };
   Explain: { subjectId: string; question?: string };
+  Faltas: undefined;
+  Tasks: undefined;
 };

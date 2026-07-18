@@ -15,6 +15,8 @@ import { ActiveClassScreen } from '../features/sessions/ActiveClassScreen';
 import { CloseClassScreen } from '../features/sessions/CloseClassScreen';
 import { NewNoteScreen } from '../features/notes/NewNoteScreen';
 import { ExplainScreen } from '../features/study/ExplainScreen';
+import { FaltasScreen } from '../features/attendance/FaltasScreen';
+import { TasksScreen } from '../features/tasks/TasksScreen';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -78,6 +80,16 @@ export function RootNavigator() {
         name="Explain"
         component={ExplainScreen}
         options={{ title: 'Repaso con IA' }}
+      />
+      <Stack.Screen
+        name="Faltas"
+        component={FaltasScreen}
+        options={{ title: 'Faltas' }}
+      />
+      <Stack.Screen
+        name="Tasks"
+        component={TasksScreen}
+        options={{ title: 'Pendientes' }}
       />
     </Stack.Navigator>
   );
