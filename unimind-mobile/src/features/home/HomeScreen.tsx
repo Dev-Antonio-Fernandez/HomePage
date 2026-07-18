@@ -8,6 +8,7 @@ import { Badge } from '../../components/ui/Badge';
 import { StatTile } from '../../components/ui/StatTile';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { Button } from '../../components/ui/Button';
 import { colors, spacing, radius, fontSize } from '../../theme';
 import {
   greeting,
@@ -15,13 +16,21 @@ import {
   WEEKDAYS_SHORT,
   isoDate,
   relativeToNow,
+  hmToMinutes,
 } from '../../utils/dates';
 import { summarizeAbsences, riskColor } from '../../utils/attendance';
-import { Schedule, Sessions, Subjects, Tasks } from '../../db';
+import { Attendance, Schedule, Sessions, Subjects, Tasks } from '../../db';
 import type { ClassOfDay } from '../../db/repositories/schedule';
 import type { TaskWithSubject } from '../../db/repositories/tasks';
 import { Settings } from '../../db';
 import { useRootNav } from '../../navigation/hooks';
+
+interface NowInfo {
+  cls: ClassOfDay;
+  sessionId: string | null;
+  marked: boolean;
+  inProgress: boolean; // true = en curso; false = próxima (empieza pronto)
+}
 
 interface HomeData {
   name: string;
@@ -30,9 +39,48 @@ interface HomeData {
   limitTotal: number;
   worstRisk: string;
   pending: TaskWithSubject[];
+  now: NowInfo | null;
   last:
     | (Awaited<ReturnType<typeof Sessions.mostRecentSession>>)
     | null;
+}
+
+// Encuentra la clase en curso (o la próxima si empieza en <= 20 min) de hoy.
+async function detectNow(): Promise<NowInfo | null> {
+  const now = new Date();
+  const todayClasses = await Schedule.classesForWeekday(now.getDay());
+  if (todayClasses.length === 0) return null;
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+
+  let picked: ClassOfDay | null = null;
+  let inProgress = false;
+  for (const c of todayClasses) {
+    const start = hmToMinutes(c.start_time);
+    const end = hmToMinutes(c.end_time);
+    if (nowMin >= start && nowMin < end) {
+      picked = c;
+      inProgress = true;
+      break;
+    }
+  }
+  if (!picked) {
+    // No hay clase en curso: busca la próxima que empiece dentro de 20 min.
+    for (const c of todayClasses) {
+      const start = hmToMinutes(c.start_time);
+      if (start - nowMin > 0 && start - nowMin <= 20) {
+        picked = c;
+        inProgress = false;
+        break;
+      }
+    }
+  }
+  if (!picked) return null;
+
+  const session = await Sessions.todaySessionForSubject(picked.subject_id);
+  const marked = session
+    ? !!(await Attendance.attendanceForSession(session.id))
+    : false;
+  return { cls: picked, sessionId: session?.id ?? null, marked, inProgress };
 }
 
 const QUICK_ACTIONS = [
@@ -71,6 +119,8 @@ export function HomeScreen() {
         worst = colors.warning;
     }
 
+    const now = await detectNow();
+
     setData({
       name: nameSetting || 'estudiante',
       classes,
@@ -78,6 +128,7 @@ export function HomeScreen() {
       limitTotal,
       worstRisk: worst,
       pending,
+      now,
       last,
     });
   }, []);
@@ -99,6 +150,21 @@ export function HomeScreen() {
       end_time: c.end_time,
     });
     nav.navigate('ActiveClass', { sessionId });
+  };
+
+  // Registra asistencia de la clase en curso con un toque (Sí/No).
+  const markNow = async (info: NowInfo, status: 'asistio' | 'falto') => {
+    const sessionId = await Sessions.resumeOrOpen(info.cls.subject_id, {
+      start_time: info.cls.start_time,
+      end_time: info.cls.end_time,
+    });
+    await Attendance.markAttendance({
+      subjectId: info.cls.subject_id,
+      sessionId,
+      status,
+      retardoValue: info.cls.subject.retardo_value,
+    });
+    load(selectedDay);
   };
 
   const onQuick = (key: string) => {
@@ -158,6 +224,63 @@ export function HomeScreen() {
           );
         })}
       </View>
+
+      {/* Clase AHORA — detección automática + asistencia de un toque */}
+      {data?.now ? (
+        <Card accent={colors.primaryBorder}>
+          <View style={styles.nowHead}>
+            <Badge
+              label={data.now.inProgress ? 'Ahora' : 'En breve'}
+              color={colors.primary}
+              solid
+            />
+            <Text variant="faint">
+              {data.now.cls.start_time} – {data.now.cls.end_time}
+              {data.now.cls.room_override || data.now.cls.subject.room
+                ? `  ·  ${data.now.cls.room_override || data.now.cls.subject.room}`
+                : ''}
+            </Text>
+          </View>
+          <Text variant="heading" style={{ marginTop: spacing.sm }}>
+            {data.now.cls.subject.name}
+          </Text>
+
+          {/* Asistencia de un toque */}
+          {data.now.marked ? (
+            <Text
+              variant="body"
+              color={colors.success}
+              style={{ marginTop: spacing.md }}
+            >
+              ✓ Asistencia registrada
+            </Text>
+          ) : (
+            <View style={{ marginTop: spacing.md, gap: spacing.sm }}>
+              <Text variant="muted">¿Vas a asistir a esta clase?</Text>
+              <View style={styles.nowButtons}>
+                <Button
+                  label="Sí, asistí"
+                  onPress={() => markNow(data.now!, 'asistio')}
+                  style={styles.flex}
+                />
+                <Button
+                  label="No, falté"
+                  onPress={() => markNow(data.now!, 'falto')}
+                  variant="danger"
+                  style={styles.flex}
+                />
+              </View>
+            </View>
+          )}
+
+          <Button
+            label="✏️  Tomar notas de esta clase"
+            onPress={() => openClass(data.now!.cls)}
+            variant="secondary"
+            style={{ marginTop: spacing.sm }}
+          />
+        </Card>
+      ) : null}
 
       {/* Clases del día */}
       <View style={styles.section}>
@@ -294,6 +417,12 @@ const styles = StyleSheet.create({
   section: { gap: spacing.sm },
   flex: { flex: 1 },
   week: { flexDirection: 'row', justifyContent: 'space-between', gap: spacing.xs },
+  nowHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  nowButtons: { flexDirection: 'row', gap: spacing.sm },
   dayChip: {
     flex: 1,
     alignItems: 'center',

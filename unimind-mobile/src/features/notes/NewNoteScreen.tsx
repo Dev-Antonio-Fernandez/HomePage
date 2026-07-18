@@ -9,7 +9,8 @@ import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { colors, spacing, radius } from '../../theme';
-import { Notes, Subjects } from '../../db';
+import { Notes, Schedule, Subjects } from '../../db';
+import { hmToMinutes } from '../../utils/dates';
 import type { Subject, NoteType } from '../../db/types';
 import { NOTE_TYPES } from './noteTypes';
 import { AIService, MissingKeyError } from '../../ai';
@@ -32,9 +33,22 @@ export function NewNoteScreen() {
     (async () => {
       const list = await Subjects.listSubjects();
       setSubjects(list);
-      if (!subjectId && list.length > 0) setSubjectId(list[0].id);
+      if (route.params?.subjectId || list.length === 0) return;
+
+      // Sin materia indicada: auto-selecciona la clase en curso ahora mismo.
+      const now = new Date();
+      const todayClasses = await Schedule.classesForWeekday(now.getDay());
+      const nowMin = now.getHours() * 60 + now.getMinutes();
+      const current = todayClasses.find(
+        (c) =>
+          nowMin >= hmToMinutes(c.start_time) &&
+          nowMin < hmToMinutes(c.end_time),
+      );
+      setSubjectId(current ? current.subject_id : list[0].id);
     })();
-  }, [subjectId]);
+    // Solo al montar.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const save = async () => {
     if (!subjectId) {
