@@ -56,3 +56,13 @@ export async function transcribeAudio(uri: string): Promise<string> {
   const data = (await res.json()) as { text?: string };
   return (data.text ?? '').trim();
 }
+
+// Transcribe varios segmentos en paralelo y los une en un solo texto ordenado.
+export async function transcribeSegments(uris: string[]): Promise<string> {
+  if (uris.length === 0) return '';
+  const parts = await Promise.all(uris.map((u) => transcribeAudio(u)));
+  return parts
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0)
+    .join('\n\n');
+}

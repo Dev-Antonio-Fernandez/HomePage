@@ -1,6 +1,10 @@
 export * as AIService from './AIService';
 export { AIError, MissingKeyError } from './AIService';
-export { transcribeAudio, MissingSttKeyError } from './transcription';
+export {
+  transcribeAudio,
+  transcribeSegments,
+  MissingSttKeyError,
+} from './transcription';
 export {
   getApiKey,
   setApiKey,
