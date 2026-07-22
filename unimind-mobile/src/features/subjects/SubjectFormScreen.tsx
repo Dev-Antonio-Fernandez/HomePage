@@ -248,13 +248,9 @@ export function SubjectFormScreen() {
                   );
                 })}
               </View>
-              <View style={styles.rowInputs}>
-                <View style={styles.flex}>
-                  <TimeField label="Inicio" value={bStart} onChange={setBStart} placeholder="Elegir" />
-                </View>
-                <View style={styles.flex}>
-                  <TimeField label="Fin" value={bEnd} onChange={setBEnd} placeholder="Elegir" />
-                </View>
+              <View style={{ gap: spacing.md }}>
+                <TimeField label="Inicio" value={bStart} onChange={setBStart} placeholder="Elegir" />
+                <TimeField label="Fin" value={bEnd} onChange={setBEnd} placeholder="Elegir" />
               </View>
               <Button
                 label={
