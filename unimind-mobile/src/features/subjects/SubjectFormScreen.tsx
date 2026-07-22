@@ -7,6 +7,7 @@ import { Text } from '../../components/ui/Text';
 import { Card } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
+import { TimeField } from '../../components/ui/TimeField';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { colors, spacing, radius, subjectColors } from '../../theme';
 import { Schedule, Subjects } from '../../db';
@@ -249,10 +250,10 @@ export function SubjectFormScreen() {
               </View>
               <View style={styles.rowInputs}>
                 <View style={styles.flex}>
-                  <Input label="Inicio" value={bStart} onChangeText={setBStart} placeholder="10:00" />
+                  <TimeField label="Inicio" value={bStart} onChange={setBStart} placeholder="Elegir" />
                 </View>
                 <View style={styles.flex}>
-                  <Input label="Fin" value={bEnd} onChangeText={setBEnd} placeholder="11:30" />
+                  <TimeField label="Fin" value={bEnd} onChange={setBEnd} placeholder="Elegir" />
                 </View>
               </View>
               <Button
