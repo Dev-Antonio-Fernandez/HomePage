@@ -117,6 +117,20 @@ const MIGRATIONS: string[] = [
   CREATE INDEX IF NOT EXISTS idx_tasks_subject ON tasks(subject_id);
   CREATE INDEX IF NOT EXISTS idx_flashcards_subject ON flashcards(subject_id);
   `,
+  // v2 — apuntes de estudio visuales generados por IA
+  `
+  CREATE TABLE IF NOT EXISTS study_cards (
+    id TEXT PRIMARY KEY NOT NULL,
+    subject_id TEXT NOT NULL,
+    session_id TEXT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
+  );
+  CREATE INDEX IF NOT EXISTS idx_study_cards_subject ON study_cards(subject_id);
+  CREATE INDEX IF NOT EXISTS idx_study_cards_session ON study_cards(session_id);
+  `,
 ];
 
 export async function runMigrations(db: SQLiteDatabase): Promise<void> {

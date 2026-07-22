@@ -11,8 +11,17 @@ import {
   detectTasksPrompt,
   explainPrompt,
   structurePrompt,
+  studyCardsPrompt,
 } from './prompts';
-import { getDb, Notes, Sessions, Subjects, Tasks } from '../db';
+import {
+  getDb,
+  Notes,
+  Sessions,
+  Subjects,
+  Tasks,
+  StudyCards,
+} from '../db';
+import type { StudyCardContent } from '../db/repositories/studyCards';
 import { newId } from '../utils/ids';
 import type { NoteType } from '../db/types';
 
@@ -295,6 +304,61 @@ export async function structureTranscript(
   }
 
   return { summary, notesAdded, tasksAdded };
+}
+
+interface RawStudyCard extends StudyCardContent {
+  title?: string;
+}
+
+// Genera apuntes de estudio visuales para una clase y los guarda.
+export async function generateStudyCards(sessionId: string): Promise<number> {
+  const session = await Sessions.getSession(sessionId);
+  if (!session) throw new AIError('Sesión no encontrada.');
+  const subject = await Subjects.getSubject(session.subject_id);
+  const notes = await Notes.notesForSession(sessionId);
+  if (notes.length === 0) {
+    throw new AIError('Esta clase no tiene notas para generar apuntes.');
+  }
+
+  const p = studyCardsPrompt({
+    subject: subject?.name ?? 'Materia',
+    topic: session.topic,
+    notes,
+  });
+  const out = await chat(
+    [
+      { role: 'system', content: p.system },
+      { role: 'user', content: p.user },
+    ],
+    'main',
+    { action: 'generateStudyCards', subjectId: session.subject_id, sessionId },
+  );
+
+  const parsed = parseJson<{ cards?: RawStudyCard[] }>(out);
+  const cards = parsed?.cards ?? [];
+  if (cards.length === 0) return 0;
+
+  // Reemplaza los apuntes previos de esta clase.
+  await StudyCards.deleteCardsForSession(sessionId);
+
+  let n = 0;
+  for (const c of cards) {
+    if (!c.title || !c.idea) continue;
+    await StudyCards.createStudyCard({
+      subject_id: session.subject_id,
+      session_id: sessionId,
+      title: c.title,
+      content: {
+        idea: c.idea,
+        formula_latex: c.formula_latex ?? null,
+        breakdown: c.breakdown ?? [],
+        steps: c.steps ?? [],
+        check: c.check ?? [],
+      },
+    });
+    n++;
+  }
+  return n;
 }
 
 export async function explainDoubt(params: {

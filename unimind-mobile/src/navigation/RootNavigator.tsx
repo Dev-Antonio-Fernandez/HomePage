@@ -18,6 +18,8 @@ import { ExplainScreen } from '../features/study/ExplainScreen';
 import { FaltasScreen } from '../features/attendance/FaltasScreen';
 import { TasksScreen } from '../features/tasks/TasksScreen';
 import { RecordClassScreen } from '../features/sessions/RecordClassScreen';
+import { StudyClassScreen } from '../features/study/StudyClassScreen';
+import { ReviewScreen } from '../features/study/ReviewScreen';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -96,6 +98,16 @@ export function RootNavigator() {
         name="RecordClass"
         component={RecordClassScreen}
         options={{ title: 'Grabar clase' }}
+      />
+      <Stack.Screen
+        name="StudyClass"
+        component={StudyClassScreen}
+        options={{ title: 'Apuntes' }}
+      />
+      <Stack.Screen
+        name="Review"
+        component={ReviewScreen}
+        options={{ title: 'Repaso' }}
       />
     </Stack.Navigator>
   );

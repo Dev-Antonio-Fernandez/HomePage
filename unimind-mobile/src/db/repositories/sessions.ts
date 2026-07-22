@@ -117,3 +117,16 @@ export async function sessionsForSubject(
     subjectId,
   );
 }
+
+// Todas las clases con nombre/color de materia (para la pestaña Estudio).
+export async function allSessionsWithSubject(): Promise<
+  (ClassSession & { subject_name: string; subject_color: string })[]
+> {
+  const db = await getDb();
+  return db.getAllAsync(
+    `SELECT cs.*, s.name AS subject_name, s.color AS subject_color
+     FROM class_sessions cs
+     JOIN subjects s ON s.id = cs.subject_id
+     ORDER BY cs.date DESC, cs.created_at DESC;`,
+  );
+}

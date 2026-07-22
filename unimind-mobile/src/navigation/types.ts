@@ -19,4 +19,6 @@ export type RootStackParamList = {
   Faltas: undefined;
   Tasks: undefined;
   RecordClass: { sessionId: string };
+  StudyClass: { sessionId: string };
+  Review: { subjectId: string };
 };

@@ -124,4 +124,41 @@ Reglas:
   return { system, user };
 }
 
+// Genera apuntes de estudio VISUALES a partir de las notas de una clase.
+export function studyCardsPrompt(params: {
+  subject: string;
+  topic: string | null;
+  notes: Note[];
+}) {
+  const system =
+    'Eres un tutor que crea apuntes de estudio claros y visuales para un ' +
+    'estudiante que aprende mejor con ejemplos y fórmulas bien desglosadas. ' +
+    'No inventas contenido que no esté en las notas.';
+  const user = `Materia: ${params.subject}. Tema: ${params.topic || 'Sin especificar'}.
+Notas de la clase:
+${notesToContext(params.notes)}
+
+Crea apuntes de estudio. Devuelve SOLO un JSON válido con esta forma exacta:
+{
+  "cards": [
+    {
+      "title": "nombre del concepto",
+      "idea": "explicación en UNA frase simple y clara",
+      "formula_latex": "fórmula en LaTeX o null si el concepto no tiene fórmula",
+      "breakdown": [{"symbol": "σ", "meaning": "qué significa ese símbolo en español simple"}],
+      "steps": ["ejemplo numérico paso a paso, un paso por elemento del arreglo"],
+      "check": ["1 o 2 preguntas cortas para verificar comprensión"]
+    }
+  ]
+}
+
+Reglas:
+- Un "card" por concepto importante de la clase (entre 1 y 6).
+- "formula_latex": usa LaTeX válido (ej. "\\\\sigma = \\\\sqrt{\\\\frac{\\\\sum (x_i - \\\\mu)^2}{N}}"). Si el concepto NO tiene fórmula, pon null y deja "breakdown" vacío.
+- "breakdown": explica cada símbolo de la fórmula con lenguaje cotidiano. Vacío si no hay fórmula.
+- "steps": ejemplo concreto con números reales, resuelto paso a paso.
+- Responde en español. No agregues texto fuera del JSON.`;
+  return { system, user };
+}
+
 export { NOTE_TYPE_LABEL };
