@@ -1,5 +1,6 @@
 export * as AIService from './AIService';
 export { AIError, MissingKeyError } from './AIService';
+export type { ExamQuestion } from './AIService';
 export {
   transcribeAudio,
   transcribeSegments,

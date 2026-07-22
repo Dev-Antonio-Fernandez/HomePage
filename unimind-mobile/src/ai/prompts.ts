@@ -161,4 +161,41 @@ Reglas:
   return { system, user };
 }
 
+// Genera un examen de opción múltiple tipo real a partir del material.
+export function examPrompt(params: {
+  subject: string;
+  material: string;
+  count: number;
+}) {
+  const system =
+    'Eres un profesor que redacta exámenes de opción múltiple realistas y ' +
+    'justos, basados solo en el material del alumno. Las opciones incorrectas ' +
+    'deben ser plausibles (distractores creíbles), no absurdas.';
+  const user = `Materia: ${params.subject}.
+Material de estudio del alumno:
+"""
+${params.material}
+"""
+
+Crea un examen de ${params.count} preguntas de opción múltiple. Devuelve SOLO un JSON válido:
+{
+  "questions": [
+    {
+      "question": "enunciado de la pregunta",
+      "options": ["opción A", "opción B", "opción C", "opción D"],
+      "correct": 0,
+      "topic": "tema corto al que pertenece la pregunta"
+    }
+  ]
+}
+
+Reglas:
+- Exactamente 4 opciones por pregunta; "correct" es el índice (0-3) de la correcta.
+- Preguntas tipo examen real: conceptos, definiciones, aplicación, fórmulas.
+- Distractores creíbles (no obvios).
+- "topic": tema breve para saber qué reforzar si falla.
+- Basa TODO en el material dado. Responde en español. Solo el JSON.`;
+  return { system, user };
+}
+
 export { NOTE_TYPE_LABEL };

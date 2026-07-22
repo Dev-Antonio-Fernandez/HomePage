@@ -7,26 +7,31 @@ import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { colors, spacing } from '../../theme';
-import { Sessions, StudyCards } from '../../db';
-import type { ClassSession } from '../../db/types';
+import { Flashcards, StudyCards, Subjects } from '../../db';
+import type { Subject } from '../../db/types';
 import { useRootNav } from '../../navigation/hooks';
 
-type ClassRow = ClassSession & {
-  subject_name: string;
-  subject_color: string;
-};
+interface Row {
+  subject: Subject;
+  apuntes: number;
+  flashcards: number;
+}
 
 export function StudyScreen() {
   const nav = useRootNav();
-  const [rows, setRows] = useState<ClassRow[] | null>(null);
-  const [counts, setCounts] = useState<Record<string, number>>({});
+  const [rows, setRows] = useState<Row[] | null>(null);
 
   const load = useCallback(async () => {
-    const list = await Sessions.allSessionsWithSubject();
-    setRows(list);
-    const c: Record<string, number> = {};
-    for (const s of list) c[s.id] = await StudyCards.countForSession(s.id);
-    setCounts(c);
+    const subjects = await Subjects.listSubjects();
+    const out: Row[] = [];
+    for (const s of subjects) {
+      const [cards, fc] = await Promise.all([
+        StudyCards.cardsForSubject(s.id),
+        Flashcards.countFlashcards(s.id),
+      ]);
+      out.push({ subject: s, apuntes: cards.length, flashcards: fc });
+    }
+    setRows(out);
   }, []);
 
   useFocusEffect(
@@ -37,39 +42,34 @@ export function StudyScreen() {
 
   return (
     <Screen onRefresh={load}>
-      <Text variant="title">Estudio</Text>
+      <Text variant="title">Estudio 🎒</Text>
       <Text variant="muted">
-        Tus clases con apuntes explicados por la IA para entenderlos bien.
+        Tus cuadernos: apuntes explicados y modo examen por materia.
       </Text>
 
       {rows && rows.length === 0 ? (
         <EmptyState
-          emoji="🎓"
-          title="Aún no hay clases"
-          message="Inicia y cierra una clase (o grábala) y aquí verás sus apuntes de estudio."
+          emoji="📚"
+          title="Sin cuadernos todavía"
+          message="Crea materias en la pestaña Clases y aquí tendrás su cuaderno de estudio."
         />
       ) : (
         <View style={{ gap: spacing.md }}>
-          {rows?.map((s) => (
+          {rows?.map(({ subject, apuntes, flashcards }) => (
             <Card
-              key={s.id}
-              onPress={() => nav.navigate('StudyClass', { sessionId: s.id })}
+              key={subject.id}
+              onPress={() => nav.navigate('SubjectStudy', { subjectId: subject.id })}
             >
               <View style={styles.row}>
-                <View style={[styles.dot, { backgroundColor: s.subject_color }]} />
+                {/* Lomo del cuaderno */}
+                <View style={[styles.spine, { backgroundColor: subject.color }]} />
                 <View style={styles.flex}>
-                  <Text variant="subheading">{s.topic || 'Clase sin tema'}</Text>
-                  <Text variant="muted">
-                    {s.subject_name}
-                    {'   ·   '}
-                    {s.date}
+                  <Text variant="subheading">{subject.name}</Text>
+                  <Text variant="faint">
+                    {apuntes} apuntes · {flashcards} flashcards
                   </Text>
                 </View>
-                {counts[s.id] > 0 ? (
-                  <Badge label={`${counts[s.id]} apuntes`} color={colors.primary} soft />
-                ) : (
-                  <Badge label="Generar" color={colors.textMuted} soft />
-                )}
+                <Text variant="faint" style={styles.chev}>›</Text>
               </View>
             </Card>
           ))}
@@ -82,5 +82,6 @@ export function StudyScreen() {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  dot: { width: 12, height: 12, borderRadius: 6 },
+  spine: { width: 8, height: 46, borderRadius: 3 },
+  chev: { fontSize: 22 },
 });

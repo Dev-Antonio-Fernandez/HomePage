@@ -12,6 +12,7 @@ import {
   explainPrompt,
   structurePrompt,
   studyCardsPrompt,
+  examPrompt,
 } from './prompts';
 import {
   getDb,
@@ -20,6 +21,7 @@ import {
   Subjects,
   Tasks,
   StudyCards,
+  Flashcards,
 } from '../db';
 import type { StudyCardContent } from '../db/repositories/studyCards';
 import { newId } from '../utils/ids';
@@ -359,6 +361,67 @@ export async function generateStudyCards(sessionId: string): Promise<number> {
     n++;
   }
   return n;
+}
+
+export interface ExamQuestion {
+  question: string;
+  options: string[];
+  correct: number;
+  topic: string;
+}
+
+// Genera un examen de opción múltiple a partir de todo el material de la materia.
+export async function generateExam(
+  subjectId: string,
+  count = 8,
+): Promise<ExamQuestion[]> {
+  const subject = await Subjects.getSubject(subjectId);
+  const [notes, cards, flashcards] = await Promise.all([
+    Notes.notesForSubject(subjectId),
+    StudyCards.cardsForSubject(subjectId),
+    Flashcards.flashcardsForSubject(subjectId),
+  ]);
+
+  const parts: string[] = [];
+  for (const n of notes.slice(0, 40)) {
+    parts.push(`- ${n.cleaned_text || n.raw_text}`);
+  }
+  for (const c of cards.slice(0, 20)) {
+    parts.push(`- ${c.title}: ${c.content.idea}`);
+  }
+  for (const f of flashcards.slice(0, 30)) {
+    parts.push(`- P: ${f.question} R: ${f.answer}`);
+  }
+  const material = parts.join('\n');
+  if (material.trim().length === 0) {
+    throw new AIError('Esta materia aún no tiene material para hacer examen.');
+  }
+
+  const p = examPrompt({
+    subject: subject?.name ?? 'Materia',
+    material,
+    count,
+  });
+  const out = await chat(
+    [
+      { role: 'system', content: p.system },
+      { role: 'user', content: p.user },
+    ],
+    'main',
+    { action: 'generateExam', subjectId },
+  );
+
+  const parsed = parseJson<{ questions?: ExamQuestion[] }>(out);
+  const questions = (parsed?.questions ?? []).filter(
+    (q) =>
+      q.question &&
+      Array.isArray(q.options) &&
+      q.options.length === 4 &&
+      typeof q.correct === 'number' &&
+      q.correct >= 0 &&
+      q.correct <= 3,
+  );
+  return questions;
 }
 
 export async function explainDoubt(params: {

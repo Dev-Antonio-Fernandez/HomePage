@@ -19,6 +19,8 @@ import { FaltasScreen } from '../features/attendance/FaltasScreen';
 import { TasksScreen } from '../features/tasks/TasksScreen';
 import { RecordClassScreen } from '../features/sessions/RecordClassScreen';
 import { StudyClassScreen } from '../features/study/StudyClassScreen';
+import { SubjectStudyScreen } from '../features/study/SubjectStudyScreen';
+import { ExamScreen } from '../features/study/ExamScreen';
 import { ReviewScreen } from '../features/study/ReviewScreen';
 
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -103,6 +105,16 @@ export function RootNavigator() {
         name="StudyClass"
         component={StudyClassScreen}
         options={{ title: 'Apuntes' }}
+      />
+      <Stack.Screen
+        name="SubjectStudy"
+        component={SubjectStudyScreen}
+        options={{ title: 'Cuaderno' }}
+      />
+      <Stack.Screen
+        name="Exam"
+        component={ExamScreen}
+        options={{ title: 'Modo examen' }}
       />
       <Stack.Screen
         name="Review"
