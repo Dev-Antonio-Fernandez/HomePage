@@ -9,7 +9,10 @@ interface Props {
 }
 
 function buildHtml(latex: string, color: string): string {
-  const safe = JSON.stringify(latex);
+  // JSON.stringify escapa comillas/backslashes, pero NO "</script>".
+  // Escapamos "<" a < para impedir romper la etiqueta <script> (evita
+  // inyección de HTML/JS en el WebView si el LaTeX de la IA trajera "</script>").
+  const safe = JSON.stringify(latex).replace(/</g, '\\u003c');
   return `<!DOCTYPE html><html><head>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
